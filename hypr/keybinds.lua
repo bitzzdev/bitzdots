@@ -15,8 +15,8 @@ hl.bind(S .. " + E", hl.dsp.exec_cmd("nautilus"))
 -- Fullscreen
 hl.bind(S .. " + F", hl.dsp.window.fullscreen())
 
--- Browser
-hl.bind(S .. " + W", hl.dsp.exec_cmd("brave-origin || brave-browser"))
+-- Browser (Chromium ignores GTK theming; force dark chrome)
+hl.bind(S .. " + W", hl.dsp.exec_cmd("brave-origin --force-dark-mode || brave-browser --force-dark-mode"))
 
 -- Lock screen
 hl.bind(S .. " + L", hl.dsp.exec_cmd("hyprlock"))
@@ -90,7 +90,7 @@ hl.bind(SC .. " + Q", hl.dsp.exit())
 hl.bind(SC .. " + F", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(S  .. " + H", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(SS .. " + space", hl.dsp.exec_cmd("wofi --show drun"))
-hl.bind(S  .. " + C",     hl.dsp.exec_cmd("chromium"))
+hl.bind(S  .. " + C",     hl.dsp.exec_cmd("chromium --force-dark-mode"))
 
 -- Wallpaper selector
 hl.bind("SUPER + SHIFT + W", hl.dsp.exec_cmd("~/.config/wallust/wallpaper-select.sh"))
