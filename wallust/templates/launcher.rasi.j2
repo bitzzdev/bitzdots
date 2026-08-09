@@ -26,7 +26,7 @@ mainbox {
 }
 
 inputbar {
-    padding:          14px 18px 10px;
+    padding:          12px 16px 8px;
     background-color: @bg1;
     children:         [ prompt, entry ];
 }
@@ -43,17 +43,18 @@ entry {
 }
 
 listview {
-    columns:      2;
-    lines:        6;
-    spacing:      4px;
-    padding:      8px;
+    columns:      4;
+    lines:        3;
+    spacing:      6px;
+    padding:      10px;
     fixed-height: false;
     flow:         horizontal;
 }
 
 element {
-    padding:          8px 12px;
-    spacing:          10px;
+    orientation:      vertical;
+    padding:          8px;
+    spacing:          6px;
     border-radius:    0;
 }
 
@@ -75,10 +76,13 @@ element selected text {
 }
 
 element-icon {
-    size:             24px;
+    size:             64px;
+    horizontal-align: 0.5;
     vertical-align:   0.5;
 }
 
 element-text {
-    vertical-align:   0.5;
+    horizontal-align: 0.5;
+    text-color:       @fg1;
+    font:            "JetBrainsMono Nerd Font Medium 9";
 }

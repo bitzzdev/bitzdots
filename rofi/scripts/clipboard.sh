@@ -40,7 +40,7 @@ fi
 
 selected=$(
     echo "$entries" | rofi -dmenu -i -p "$PROMPT" -theme "$ROFI_THEME" \
-        -theme-str 'listview { columns: 1; lines: 10; } entry { placeholder: ""; }'
+        -theme-str 'listview { columns: 1; lines: 10; spacing: 2px; padding: 6px; flow: vertical; } window { width: 620px; } element { orientation: horizontal; padding: 8px 12px; spacing: 12px; } element-icon { size: 22px; vertical-align: 0.5; } element-text { horizontal-align: 0; vertical-align: 0.5; text-color: @fg0; } entry { placeholder: ""; }'
 )
 
 if [ -z "$selected" ]; then

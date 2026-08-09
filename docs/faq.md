@@ -91,8 +91,9 @@ gsettings set org.gnome.desktop.interface gtk-theme Adwaita
 **Qt apps:**
 ```bash
 # Verify environment
-echo $QT_STYLE_OVERRIDE         # Should be "breeze-dark"
 echo $QT_QPA_PLATFORMTHEME      # Should be "qt6ct"
+# QT_STYLE_OVERRIDE must be UNSET (empty). If set, remove it:
+unset QT_STYLE_OVERRIDE         # and remove from hypr/variables.lua / environment.d
 
 # Check qt5ct config
 cat ~/.config/qt5ct/qt5ct.conf
@@ -102,6 +103,10 @@ cat ~/.config/qt5ct/qt5ct.conf
 cat ~/.config/qt6ct/qt6ct.conf
 # Should have: style=Breeze-Dark, custom_palette=true
 ```
+
+If qt6ct warns *"Please remove the QT_STYLE_OVERRIDE environment variable"*,
+the variable is still set (commonly from an old session or `hypr/variables.lua`).
+Unset it and log out/in (or restart the Hyprland session) to re-export env vars.
 
 ## Waybar
 
