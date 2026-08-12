@@ -611,19 +611,33 @@ echo -e "${CYAN}║     bitzdots — Auto Installer     ║${NC}"
 echo -e "${CYAN}╚══════════════════════════════════╝${NC}"
 echo ""
 
+SKIP_DEPS=false
+
 while [[ $# -gt 0 ]]; do
     case "$1" in
+        --skip-deps)
+            SKIP_DEPS=true
+            ;;
         --help|-h)
-            echo "Usage: $0"
+            echo "Usage: $0 [OPTIONS]"
             echo ""
-            echo "  --help         Show this help"
+            echo "  --skip-deps    Skip installation of dependencies"
+            echo "  --help, -h     Show this help"
             exit 0
+            ;;
+        *)
+            warn "Unknown option: $1"
             ;;
     esac
     shift
 done
 
-install_deps
+if $SKIP_DEPS; then
+    log "Skipping dependency installation (--skip-deps set)"
+else
+    install_deps
+fi
+
 setup_wallpapers
 setup_cache
 mkdir -p "$HOME/Pictures/Screenshots/Fullscreen" "$HOME/Pictures/Screenshots/Freeform" 2>/dev/null || true
@@ -645,7 +659,9 @@ if command -v brightnessctl &>/dev/null; then
     fi
 fi
 
-install_cargo_tools
+if ! $SKIP_DEPS; then
+    install_cargo_tools
+fi
 
 # Force dark theme for GTK4 apps (Nautilus, etc.)
 if command -v gsettings &>/dev/null; then
