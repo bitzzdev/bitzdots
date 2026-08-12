@@ -19,7 +19,7 @@
 # On-demand only: rofi exits when the menu closes; nothing keeps running.
 
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
-ROFI_THEME="$CONFIG_DIR/rofi/themes/spotlight.rasi"
+ROFI_THEME="$CONFIG_DIR/rofi/themes/launcher.rasi"
 DEFAULTS_FILE="$CONFIG_DIR/hypr/defaults.lua"
 
 # --- Defaults (from hypr/defaults.lua) ---
@@ -107,7 +107,7 @@ build_list() {
 # --- Launch rofi (sync: build list fully, then show, live-filter) ---
 out=$(build_list | rofi -dmenu -i -p "Spotlight" -sync \
     -theme "$ROFI_THEME" \
-    -theme-str 'listview { lines: 12; fixed-height: false; } window { width: 720px; }' \
+    -theme-str 'listview { columns: 1; lines: 12; spacing: 2px; padding: 6px; flow: vertical; } window { width: 620px; } element { orientation: horizontal; padding: 8px 12px; spacing: 12px; } element-icon { size: 22px; vertical-align: 0.5; } element-text { horizontal-align: 0; vertical-align: 0.5; text-color: @fg0; } entry { placeholder: "Search apps, files, folders or the web..."; }' \
     -format $'s\tf' -sep $'\n')
 
 [ -z "$out" ] && exit 0

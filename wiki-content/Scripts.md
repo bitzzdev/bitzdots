@@ -178,7 +178,9 @@ exits when the menu closes, no background daemon.
   the typed query; pressing Enter with no matching row also does a web search
 - Apps launch via their `.desktop` entry; files/folders open in the default
   file explorer (`$FILE_EXPLORER`)
-- Defaults are read from `hypr/defaults.lua` (`BROWSER`, `FILE_EXPLORER`)
+- Uses the same wallust-generated rofi template theme as the launcher
+  (`launcher.rasi`); defaults are read from `hypr/defaults.lua`
+  (`BROWSER`, `FILE_EXPLORER`)
 
 ### `system-power.sh`
 
