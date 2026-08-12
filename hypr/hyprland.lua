@@ -1,4 +1,5 @@
 require("variables")
+require("defaults")
 require("monitors")
 require("input")
 require("appearance")

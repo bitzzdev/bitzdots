@@ -1,22 +1,23 @@
 local S  = "SUPER"
+local AL = "ALT"
 local SA = "SUPER + ALT"
 local SS = "SUPER + SHIFT"
 local SC = "SUPER + CTRL"
 
 -- Terminal
-hl.bind(S .. " + T", hl.dsp.exec_cmd("kitty"))
+hl.bind(S .. " + T", hl.dsp.exec_cmd(TERMINAL))
 
 -- Close active window
 hl.bind(S .. " + Q", hl.dsp.window.close())
 
 -- File manager (Nautilus)
-hl.bind(S .. " + E", hl.dsp.exec_cmd("nautilus"))
+hl.bind(S .. " + E", hl.dsp.exec_cmd(FILE_EXPLORER))
 
 -- Fullscreen
 hl.bind(S .. " + F", hl.dsp.window.fullscreen())
 
 -- Browser (Chromium ignores GTK theming; force dark chrome)
-hl.bind(S .. " + W", hl.dsp.exec_cmd("brave-origin --force-dark-mode || brave-browser --force-dark-mode"))
+hl.bind(S .. " + W", hl.dsp.exec_cmd(BROWSER .. " --force-dark-mode"))
 
 -- Lock screen
 hl.bind(S .. " + L", hl.dsp.exec_cmd("hyprlock"))
@@ -76,6 +77,9 @@ hl.bind(S .. " + N", hl.dsp.exec_cmd("swaync-client -t"))
 
 -- Rofi launcher
 hl.bind(S .. " + space", hl.dsp.exec_cmd("rofi -show drun -theme ~/.config/rofi/themes/launcher.rasi"))
+
+-- Spotlight search (apps, commands, files, windows) — on-demand, no daemon
+hl.bind(AL .. " + space", hl.dsp.exec_cmd("~/.config/rofi/scripts/spotlight.sh"))
 
 -- Power menu
 hl.bind(S .. " + P", hl.dsp.exec_cmd("~/.config/rofi/scripts/system-power.sh"))

@@ -334,6 +334,7 @@ install_rofi_config() {
     link_config "$DOTFILES_DIR/rofi/scripts/script_wallpaper.sh" "$CONFIG_DIR/rofi/scripts/script_wallpaper.sh" "rofi"
     link_config "$DOTFILES_DIR/rofi/scripts/system-power.sh" "$CONFIG_DIR/rofi/scripts/system-power.sh" "rofi"
     link_config "$DOTFILES_DIR/rofi/scripts/clipboard.sh" "$CONFIG_DIR/rofi/scripts/clipboard.sh" "rofi"
+    link_config "$DOTFILES_DIR/rofi/scripts/spotlight.sh" "$CONFIG_DIR/rofi/scripts/spotlight.sh" "rofi"
     # Icons
     link_config "$DOTFILES_DIR/icons/lock-outline-sharp.svg" "$CONFIG_DIR/rofi/icons/lock.svg" "rofi"
     link_config "$DOTFILES_DIR/icons/logout-sharp.svg" "$CONFIG_DIR/rofi/icons/logout.svg" "rofi"

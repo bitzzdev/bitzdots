@@ -162,6 +162,25 @@ Clipboard history manager.
 - Starts cliphist store daemon if not running
 - Keyboard navigable via rofi
 
+### `spotlight.sh`
+
+Spotlight-style search (`ALT+SPACE`). Searches installed applications, files
+and folders under `$HOME` recursively, and offers a web search — all
+on-demand with rofi, no background daemon.
+
+```bash
+~/.config/rofi/scripts/spotlight.sh
+```
+
+- Stage 1: type a query in the rofi prompt
+- Stage 2: pick from:
+  - `Search the web: <query>` — opens the default browser with the query
+  - Applications matching the query (from `.desktop` entries)
+  - Matching folders and files under `$HOME`
+- Files/folders open in the default file explorer (`$FILE_EXPLORER`)
+- Web results open in the default browser (`$BROWSER`)
+- Defaults are read from `hypr/defaults.lua` (`BROWSER`, `FILE_EXPLORER`)
+
 ### `system-power.sh`
 
 Power management menu.

@@ -41,6 +41,7 @@ All keyboard shortcuts for bitzdots. Modifiers:
 | `SUPER + W` | Open browser (Brave) |
 | `SUPER + C` | Open Chromium |
 | `SUPER + Space` | App launcher (rofi) |
+| `ALT + Space` | Spotlight search (files + folders + web, rofi) |
 | `SUPER + SHIFT + Space` | Alternate launcher (wofi) |
 
 ## Screenshots & Recording

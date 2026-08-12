@@ -1,10 +1,47 @@
 # Scripts
 
-All custom scripts. Utility scripts live in `scripts/` and are symlinked into `~/.config/wallust/`. Waybar scripts live in `waybar/scripts/`.
+Reference for all scripts in bitzdots.
 
-## Utility Scripts (`scripts/` → `~/.config/wallust/`)
+## Waybar Scripts (`waybar/scripts/`)
+
+17 scripts powering the waybar custom modules.
+
+| Script | Purpose | Used By |
+|--------|---------|---------|
+| `brightness.sh` | Outputs current brightness % with 4-tier icon as JSON | `custom/brightness` |
+| `launch.sh` | Ensures waybar + swaync are running | Autostart |
+| `media.sh` | playerctl metadata follower (artist/title/album/status) | `custom/media` |
+| `notification.sh` | Bell icon with DnD/notification count | `custom/notification` |
+| `power-profile.sh` | Queries UPower via D-Bus for active profile icon | `custom/power-profiles` |
+| `power-profile-switch.sh` | Cycles to next available power profile via D-Bus | Click handler |
+| `system-power.sh` | Rofi power menu (Lock/Logout/Sleep/Reboot/Shutdown) | `custom/power` |
+| `tui-audio.sh` | Opens pulsemixer in floating kitty | Audio click (waybar) |
+| `tui-bluetooth.sh` | Opens bluetui in floating kitty | Bluetooth click (waybar) |
+| `tui-wifi.sh` | Waits for NetworkManager, then opens impala in floating kitty | Network click (waybar) |
+| `tui-cpu.sh` | Opens btop in floating kitty | CPU click (waybar) |
+| `weather.sh` | Fetches weather from wttr.in (30-min cache) | Optional module |
+| `workspaces.sh` | Batch workspace display (5 at a time) | `custom/workspaces` |
+| `workspace-click.sh` | Determines clicked workspace from pixel offset | Workspace click |
+| `workspace-next.sh` | Focus next workspace | Scroll up |
+| `workspace-prev.sh` | Focus previous workspace | Scroll down |
+
+## Utility Scripts (`scripts/`)
 
 10 core scripts for theming and recording.
+
+### `reload-theme.sh`
+
+Applies the generated theme to all running components.
+
+```bash
+~/.config/wallust/reload-theme.sh
+```
+
+**What it does:**
+1. Reloads swaync CSS (`swaync-client --reload-css`)
+2. Updates Hyprland border colors from `colors.lua`
+3. Fixes qt6ct config path if needed
+4. Restarts waybar for full refresh
 
 ### `wallpaper-select.sh`
 
@@ -13,150 +50,102 @@ Rofi-based wallpaper picker with grid thumbnails.
 ```bash
 ~/.config/wallust/wallpaper-select.sh                    # Open picker UI
 ~/.config/wallust/wallpaper-select.sh /path/to/image.jpg  # Direct set
-~/.config/wallust/wallpaper-select.sh --live              # Live picker only
 ```
 
 **Features:**
-- Main menu with Static / Live wallpaper options (themed SVG icons)
-- Grid display with thumbnails (static) and ffmpeg-generated thumbnails (live)
+- Grid display of all wallpapers with ImageMagick thumbnails
+- Separate sections for static wallpapers and live wallpapers
 - Cached theme switching — uses pre-generated palettes when available
 - Backup/restore safety on all theme generations
 - Restarts waybar after theme change
-- **Bound to**: `SUPER + SHIFT + W`
-
-### `reload-theme.sh`
-
-Applies the generated theme to all running components without killing apps.
-
-```bash
-~/.config/wallust/reload-theme.sh
-```
-
-**What it does:**
-1. Sources color env vars from `wallust/env`
-2. Fixes `~` expansion in `qt6ct/qt6ct.conf`
-3. Reloads swaync CSS in-place (`swaync-client --reload-css`)
-4. Updates Hyprland border colors live via `hyprctl eval`
 
 ### `cache-wallpapers.sh`
 
-One-shot pre-cache of all wallpapers.
+One-shot pre-cache all wallpapers.
 
 ```bash
 ~/.config/wallust/cache-wallpapers.sh
 ```
 
-Generates wallust palettes and thumbnails for every static and live wallpaper in the directories.
+Generates wallust palettes and ImageMagick thumbnails for every wallpaper in the directories.
 
 ### `wallust-cache-daemon.sh`
 
-Event-driven background cache daemon (run by systemd).
+Event-driven background cache daemon.
 
 ```bash
-systemctl --user status wallust-cache-daemon.service
+~/.config/wallust/wallust-cache-daemon.sh
 ```
 
+**Features:**
 - Watches wallpaper directories with `inotifywait`
 - Debounces rapid file changes
-- Pre-generates palettes in background (Nice=19, idle IO)
+- Pre-generates palettes in background
 - 24-hour failure cooldown for problematic images
 - File locking for single-instance safety
+- Runs at idle priority (Nice=19)
 
 ### `record-fullscreen.sh`
 
 Toggle fullscreen screen recording.
+```bash
+~/.config/wallust/record-fullscreen.sh
+```
 
-- **Trigger**: `SUPER + R`
-- **Output**: `~/Videos/Recordings/Fullscreen/recording_YYYYMMDD_HHMMSS.mp4`
-- **Audio**: Desktop audio (default sink monitor)
-- **Guard**: Atomic `mkdir` debounce + `pgrep -x wf-recorder` cross-type guard
-- **Notifications**: Shows start/stop notifications
+- Uses `wf-recorder` with audio (pulse audio)
+- Toggles: first call starts, second call stops
+- Saves to `~/Videos/Recordings/Fullscreen/` with timestamped filename
+- Shows start/stop notifications
 
 ### `record-region.sh`
 
 Toggle region screen recording.
 
-- **Trigger**: `SUPER + SHIFT + R`
-- **Selection**: `slurp` — click and drag to select area
-- **Output**: `~/Videos/Recordings/Region/recording_YYYYMMDD_HHMMSS.mp4`
-- **Audio**: Desktop audio only
-- **Guard**: Same as fullscreen script
+```bash
+~/.config/wallust/record-region.sh
+```
+
+- Uses `slurp` for region selection + `wf-recorder` with audio
+- Same toggle behavior as fullscreen
+- Saves to `~/Videos/Recordings/Region/`
 
 ### `recording-indicator.sh`
 
-Waybar module that blinks when recording is active.
+Blinking indicator for waybar recording module.
 
-- **Trigger**: Polled by waybar every 10s
-- **Mechanism**: Checks `pgrep -x wf-recorder`
-- **Output**: Waybar JSON with text and CSS class
+- Called by waybar polling (10s interval)
+- Outputs empty JSON when not recording
+- Alternates between empty and icon JSON when recording (creates blink effect)
 
 ### `hyprlock-setup.sh`
 
-Generates a basic `hyprlock.conf` from the current wallpaper.
+Generates a basic `hyprlock.conf` from current wallpaper.
 
 ```bash
 ~/.config/wallust/hyprlock-setup.sh
 ```
 
 - Uses current wallpaper as lock screen background
-- Sets JetBrainsMono font for clock/date
-
-### `workspace-monitor.sh`
-
-Background helper that pushes instant waybar workspace updates on Hyprland workspace events (used by autostart).
-
-### `hyprlogout`
-
-Wrapper used by the power menu / wlogout to exit Hyprland cleanly.
+- Sets JetBrainsMono font for the clock/date
 
 ### `wifi-fix.sh`
 
-Boot-time WiFi stabilizer, run from `hypr/autostart.lua` shortly after login.
-
-- Waits for NetworkManager to appear on D-Bus (up to 30s)
-- Unblocks the WiFi radio (`rfkill unblock wifi`, `nmcli radio wifi on`)
-- Waits for an active connection, then reactivates saved connections if needed
-- Retries with a radio toggle if still offline
-
-Fixes the boot-time "strikethrough WiFi" waybar icon and impala crashes when NetworkManager isn't ready yet.
-
-## Waybar Scripts (`waybar/scripts/`)
-
-17 scripts powering the waybar custom modules:
-
-| Script | Purpose |
-|--------|---------|
-| `brightness.sh` | Current brightness % with 4-tier icon (JSON) |
-| `brightness-adjust.sh` | Adjust brightness up/down (scroll handler) |
-| `launch.sh` | Ensures waybar + swaync are running |
-| `media.sh` | playerctl metadata follower (artist/title/status) |
-| `notification.sh` | Bell icon with DnD/notification count |
-| `power-profile.sh` | Active UPower power profile (D-Bus) |
-| `power-profile-switch.sh` | Cycle to next power profile |
-| `system-power.sh` | Rofi power menu (Lock/Logout/Sleep/Reboot/Shutdown) |
-| `tui-audio.sh` | Opens pulsemixer in floating kitty |
-| `tui-bluetooth.sh` | Opens bluetui in floating kitty |
-| `tui-wifi.sh` | Waits for NetworkManager, then opens impala in floating kitty |
-| `tui-cpu.sh` | Opens btop in floating kitty |
-| `weather.sh` | Weather from wttr.in (30-min cache) |
-| `workspaces.sh` | Batch workspace display (5 at a time) |
-| `workspace-click.sh` | Focus clicked workspace (pixel offset) |
-| `workspace-next.sh` | Focus next workspace |
-| `workspace-prev.sh` | Focus previous workspace |
-
-## Rofi Scripts (`rofi/scripts/`)
-
-### `system-power.sh`
-
-Power management menu with themed SVG icons.
+Boot-time WiFi stabilizer. Called from `hypr/autostart.lua` a few seconds after login.
 
 ```bash
-~/.config/rofi/scripts/system-power.sh
+~/.config/wallust/wifi-fix.sh
 ```
 
-Options: **Lock** (hyprlock), **Logout** (hyprlogout), **Sleep** (systemctl suspend), **Reboot** (systemctl reboot), **Shutdown** (systemctl poweroff), **Cancel**.
+**What it does:**
+1. Waits for NetworkManager to appear on D-Bus (up to 30s)
+2. Unblocks the WiFi radio (`rfkill unblock wifi`, `nmcli radio wifi on`)
+3. Waits for an active connection (up to 45s)
+4. If still offline, reactivates every saved connection
+5. Retries with a radio toggle (off/on) if needed
 
-- **Bound to**: `SUPER + P`
+Fixes the boot-time "strikethrough WiFi" waybar icon and impala crashes caused by NetworkManager not being ready.
+
+## Rofi Scripts (`rofi/scripts/`)
 
 ### `clipboard.sh`
 
@@ -167,17 +156,45 @@ Clipboard history manager.
 ~/.config/rofi/scripts/clipboard.sh --delete      # delete mode
 ```
 
-- Lists recent entries from cliphist
-- Copy mode (`SUPER + V`): copies selected entry to clipboard
-- Delete mode (`SUPER + SHIFT + V`): removes entry
+- Lists recent clipboard entries from cliphist
+- Default mode (`SUPER+V`): decodes and copies selected entry back to clipboard
+- Delete mode (`SUPER+SHIFT+V`): removes selected entry from clipboard history
 - Starts cliphist store daemon if not running
+- Keyboard navigable via rofi
 
-### `script_wallpaper.sh`
+### `spotlight.sh`
 
-Legacy single-column wallpaper picker (grid theme, awww transitions). Installs to `~/.config/rofi/launchers/type-6/` integration.
+Spotlight-style search (`ALT+SPACE`). Searches installed applications, files
+and folders under `$HOME` recursively, and offers a web search — all
+on-demand with rofi, no background daemon.
 
-## Script Conventions
+```bash
+~/.config/rofi/scripts/spotlight.sh
+```
 
-- **Debounce mechanism** — Atomic `mkdir` to prevent double-firing (Hyprland sometimes fires keybinds twice)
-- **Cross-type guards** — `pgrep -x wf-recorder` prevents overlapping recording types
-- **Notifications** — All actions send desktop notifications via `notify-send`
+- Stage 1: type a query in the rofi prompt
+- Stage 2: pick from:
+  - `Search the web: <query>` — opens the default browser with the query
+  - Applications matching the query (from `.desktop` entries)
+  - Matching folders and files under `$HOME`
+- Files/folders open in the default file explorer (`$FILE_EXPLORER`)
+- Web results open in the default browser (`$BROWSER`)
+- Defaults are read from `hypr/defaults.lua` (`BROWSER`, `FILE_EXPLORER`)
+
+### `system-power.sh`
+
+Power management menu.
+
+```bash
+~/.config/rofi/scripts/system-power.sh
+```
+
+Options:
+- **Lock** — `hyprlock`
+- **Logout** — `hyprctl dispatch exit`
+- **Sleep** — `systemctl suspend`
+- **Reboot** — `systemctl reboot`
+- **Shutdown** — `systemctl poweroff`
+- **Cancel** — Close menu
+
+Uses themed SVG icons from rofi icons directory.
