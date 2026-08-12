@@ -164,21 +164,20 @@ Clipboard history manager.
 
 ### `spotlight.sh`
 
-Spotlight-style search (`ALT+SPACE`). Searches installed applications, files
-and folders under `$HOME` recursively, and offers a web search — all
-on-demand with rofi, no background daemon.
+Spotlight-style search (`ALT+SPACE`). One rofi prompt that searches installed
+applications, files, folders and the web — live suggestions as you type, each
+with its icon (app logo, folder icon, or browser logo). On-demand only: rofi
+exits when the menu closes, no background daemon.
 
 ```bash
 ~/.config/rofi/scripts/spotlight.sh
 ```
 
-- Stage 1: type a query in the rofi prompt
-- Stage 2: pick from:
-  - `Search the web: <query>` — opens the default browser with the query
-  - Applications matching the query (from `.desktop` entries)
-  - Matching folders and files under `$HOME`
-- Files/folders open in the default file explorer (`$FILE_EXPLORER`)
-- Web results open in the default browser (`$BROWSER`)
+- Type to filter apps / folders / files under `$HOME` live
+- `Search the web` (always visible at the top) opens the default browser with
+  the typed query; pressing Enter with no matching row also does a web search
+- Apps launch via their `.desktop` entry; files/folders open in the default
+  file explorer (`$FILE_EXPLORER`)
 - Defaults are read from `hypr/defaults.lua` (`BROWSER`, `FILE_EXPLORER`)
 
 ### `system-power.sh`
