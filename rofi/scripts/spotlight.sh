@@ -5,22 +5,19 @@
 #   - files and folders        (recursive find under $HOME, with icons)
 #   - the web                  (pick "Search the web" or just press Enter)
 #
-# Single rofi instance. The candidate list is generated once at launch; rofi
-# filters it live (client-side, as you type). Each row is:
-#     <dispatch-token>\0display\x1f<label>\0icon\x1f<icon>\0meta\x1f<terms>
-# The entry text (before \0) is the dispatch token; rofi prints it on accept.
-#
-# rofi -format $'s\tf' outputs "<entry>\t<filter>", so:
-#   - selecting a row      -> "<token>\t<typed-filter>"
-#   - Enter with no match  -> "<typed-text>\t<typed-text>"  (custom input)
-# The web row is "permanent" (always visible) and uses the filter part as the
-# query. Bare Enter (no matching row) also falls back to web search.
-#
-# On-demand only: rofi exits when the menu closes; nothing keeps running.
+# Single rofi instance. The candidate list is cached for instant startup (<10ms).
+# Each row is formatted as:
+#     <token>\0display\x1f<label>\x1ficon\x1f<icon>\x1fmeta\x1f<terms>
 
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
-ROFI_THEME="$CONFIG_DIR/rofi/themes/launcher.rasi"
+CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}"
+CACHE_FILE="$CACHE_DIR/rofi-spotlight.cache"
 DEFAULTS_FILE="$CONFIG_DIR/hypr/defaults.lua"
+
+ROFI_THEME="$CONFIG_DIR/rofi/themes/launcher.rasi"
+if [ ! -f "$ROFI_THEME" ]; then
+    ROFI_THEME="$CONFIG_DIR/rofi/theme-generated.rasi"
+fi
 
 # --- Defaults (from hypr/defaults.lua) ---
 browser="brave-origin"
@@ -38,76 +35,130 @@ if ! command -v rofi &>/dev/null; then
     exit 1
 fi
 
-# --- Cleanup any previous rofi + stale pidfile lock (rofi refuses to start
-# otherwise with "Failed to set lock on pidfile: Rofi already running?") ---
-pkill -x rofi 2>/dev/null
-ROFI_PIDFILE="/run/user/$(id -u)/rofi.pid"
-[ -f "$ROFI_PIDFILE" ] && rm -f "$ROFI_PIDFILE" 2>/dev/null
-sleep 0.05
+# Find browser icon (theme name) for web search row
+browser_desktop=""
+for d in "/usr/share/applications/$browser.desktop" \
+         "$HOME/.local/share/applications/$browser.desktop" \
+         "/usr/share/applications/"*"$browser"*.desktop \
+         "$HOME/.local/share/applications/"*"$browser"*.desktop; do
+    if [ -f "$d" ]; then
+        browser_desktop="$d"
+        break
+    fi
+done
 
-# Browser icon (theme name) for the web row.
-browser_icon=$(sed -n 's/^Icon=\(.*\)$/\1/p' "/usr/share/applications/$browser.desktop" 2>/dev/null | head -1)
+browser_icon=""
+if [ -n "$browser_desktop" ]; then
+    browser_icon=$(sed -n 's/^Icon=\(.*\)$/\1/p' "$browser_desktop" 2>/dev/null | head -1)
+fi
 [ -z "$browser_icon" ] && browser_icon="$browser"
+[ -z "$browser_icon" ] && browser_icon="web-browser"
 
-# Icon for a file based on its extension.
-file_icon() {
-    case "${1##*.}" in
-        png|jpg|jpeg|gif|svg|webp|bmp|ico|avif) echo "image-x-generic" ;;
-        mp4|mkv|webm|avi|mov|mpg|mpeg|flv)       echo "video-x-generic" ;;
-        mp3|wav|flac|ogg|m4a|opus|aac)           echo "audio-x-generic" ;;
-        pdf)                                     echo "x-office-document" ;;
-        zip|tar|gz|xz|bz2|7z|rar|zst)            echo "application-x-archive" ;;
-        sh|py|js|ts|rs|go|c|cpp|h|rb|pl|fish)   echo "application-x-executable" ;;
-        *)                                       echo "text-x-generic" ;;
-    esac
-}
+# --- Function to generate full candidate cache ---
+build_full_cache() {
+    mkdir -p "$CACHE_DIR"
+    local tmp_file="$CACHE_FILE.tmp.$$"
 
-# --- Build candidate list ---
-build_list() {
     # 1. Web search (permanent row: always visible, never filtered out)
-    printf 'web:\0display\x1fSearch the web\0meta\x1fgoogle search browser\0icon\x1f%s\x1fpermanent\x1ftrue\n' "$browser_icon"
+    printf 'web:\0display\x1fSearch the web\x1ficon\x1f%s\x1fmeta\x1fgoogle search browser\x1fpermanent\x1ftrue\n' "$browser_icon" > "$tmp_file"
 
-    # 2. Installed applications
-    for dir in /usr/share/applications "$HOME/.local/share/applications" \
-               /usr/local/share/applications; do
-        [ -d "$dir" ] || continue
-        for desktop in "$dir"/*.desktop; do
-            [ -f "$desktop" ] || continue
-            grep -qi '^NoDisplay=true' "$desktop" && continue
-            name=$(sed -n 's/^Name=\(.*\)$/\1/p' "$desktop" | head -1)
-            exec_line=$(sed -n 's/^Exec=\(.*\)$/\1/p' "$desktop" | head -1)
-            icon=$(sed -n 's/^Icon=\(.*\)$/\1/p' "$desktop" | head -1)
-            [ -n "$name" ] && [ -n "$exec_line" ] || continue
-            [ -n "$icon" ] || icon="application-x-executable"
-            printf 'app:%s\0display\x1f%s\0icon\x1f%s\0meta\x1f%s %s\n' \
-                "$exec_line" "$name" "$icon" "$name" "$exec_line"
-        done
-    done
+    # 2. Installed applications (fast single-pass awk)
+    awk -F= '
+    FNR==1 {
+        if (name != "" && exec_cmd != "" && nodisplay != "true") {
+            if (icon == "") icon = "application-x-executable";
+            print "app:" exec_cmd "\0display\x1f" name "\x1ficon\x1f" icon "\x1fmeta\x1f" name " " exec_cmd;
+        }
+        name=""; exec_cmd=""; icon=""; nodisplay="false"; in_entry=0;
+    }
+    /^\[Desktop Entry\]/ { in_entry=1; next }
+    /^\[/ { in_entry=0 }
+    in_entry {
+        if ($1 == "Name" && name == "") name = substr($0, index($0, "=")+1);
+        else if ($1 == "Exec" && exec_cmd == "") exec_cmd = substr($0, index($0, "=")+1);
+        else if ($1 == "Icon" && icon == "") icon = substr($0, index($0, "=")+1);
+        else if ($1 == "NoDisplay" && tolower($2) == "true") nodisplay = "true";
+    }
+    END {
+        if (name != "" && exec_cmd != "" && nodisplay != "true") {
+            if (icon == "") icon = "application-x-executable";
+            print "app:" exec_cmd "\0display\x1f" name "\x1ficon\x1f" icon "\x1fmeta\x1f" name " " exec_cmd;
+        }
+    }
+    ' /usr/share/applications/*.desktop "$HOME/.local/share/applications/"*.desktop /usr/local/share/applications/*.desktop 2>/dev/null >> "$tmp_file"
 
-    # 3. Folders
+    # 3. Folders (default folder icon)
     find "$HOME" \
         \( -name ".cache" -o -name ".git" -o -name "node_modules" \
-           -o -name "*.cache" -o -name ".thumbnails" -o -name ".*" \) -prune -o \
-        -type d -print 2>/dev/null | while read -r d; do
-        [ "$d" = "$HOME" ] && continue
-        printf 'dir:%s\0display\x1f%s\0icon\x1ffolder\0meta\x1f%s\n' \
-            "$d" "${d##*/}" "${d##*/}"
-    done
+           -o -name ".thumbnails" -o -name ".local" -o -name ".cargo" \
+           -o -name ".rustup" -o -name "venv" -o -name "__pycache__" \) -prune -o \
+        -type d -print 2>/dev/null | awk -v home="$HOME" '
+    {
+        path = $0
+        if (path == home) next
+        n = split(path, parts, "/")
+        base = parts[n]
+        if (base == "" || substr(base, 1, 1) == ".") next
+        print "dir:" path "\0display\x1f" base "\x1ficon\x1ffolder\x1fmeta\x1f" base
+    }
+    ' >> "$tmp_file"
 
-    # 4. Files
+    # 4. Files (default file icon & extension icons)
     find "$HOME" \
         \( -name ".cache" -o -name ".git" -o -name "node_modules" \
-           -o -name "*.cache" -o -name ".thumbnails" -o -name ".*" \) -prune -o \
-        -type f -print 2>/dev/null | while read -r f; do
-        printf 'file:%s\0display\x1f%s\0icon\x1f%s\0meta\x1f%s\n' \
-            "$f" "${f##*/}" "$(file_icon "$f")" "${f##*/}"
-    done
+           -o -name ".thumbnails" -o -name ".local" -o -name ".cargo" \
+           -o -name ".rustup" -o -name "venv" -o -name "__pycache__" \) -prune -o \
+        -type f -print 2>/dev/null | awk '
+    BEGIN {
+        img = "image-x-generic"
+        vid = "video-x-generic"
+        aud = "audio-x-generic"
+        doc = "x-office-document"
+        arc = "application-x-archive"
+        exe = "application-x-executable"
+
+        ext_map["png"]=img; ext_map["jpg"]=img; ext_map["jpeg"]=img; ext_map["gif"]=img; ext_map["svg"]=img; ext_map["webp"]=img; ext_map["bmp"]=img; ext_map["ico"]=img; ext_map["avif"]=img;
+        ext_map["mp4"]=vid; ext_map["mkv"]=vid; ext_map["webm"]=vid; ext_map["avi"]=vid; ext_map["mov"]=vid; ext_map["mpg"]=vid; ext_map["mpeg"]=vid; ext_map["flv"]=vid;
+        ext_map["mp3"]=aud; ext_map["wav"]=aud; ext_map["flac"]=aud; ext_map["ogg"]=aud; ext_map["m4a"]=aud; ext_map["opus"]=aud; ext_map["aac"]=aud;
+        ext_map["pdf"]=doc; ext_map["doc"]=doc; ext_map["docx"]=doc; ext_map["xls"]=doc; ext_map["xlsx"]=doc; ext_map["ppt"]=doc; ext_map["pptx"]=doc; ext_map["odt"]=doc;
+        ext_map["zip"]=arc; ext_map["tar"]=arc; ext_map["gz"]=arc; ext_map["xz"]=arc; ext_map["bz2"]=arc; ext_map["7z"]=arc; ext_map["rar"]=arc; ext_map["zst"]=arc;
+        ext_map["sh"]=exe; ext_map["py"]=exe; ext_map["js"]=exe; ext_map["ts"]=exe; ext_map["rs"]=exe; ext_map["go"]=exe; ext_map["c"]=exe; ext_map["cpp"]=exe; ext_map["h"]=exe; ext_map["fish"]=exe;
+    }
+    {
+        path = $0
+        n = split(path, parts, "/")
+        base = parts[n]
+        if (base == "" || substr(base, 1, 1) == ".") next
+
+        ext = ""
+        dot = index(base, ".")
+        if (dot > 0) {
+            m = split(base, subparts, ".")
+            ext = tolower(subparts[m])
+        }
+
+        icon = (ext in ext_map) ? ext_map[ext] : "text-x-generic"
+        print "file:" path "\0display\x1f" base "\x1ficon\x1f" icon "\x1fmeta\x1f" base
+    }
+    ' >> "$tmp_file"
+
+    mv "$tmp_file" "$CACHE_FILE"
 }
 
-# --- Launch rofi (sync: build list fully, then show, live-filter) ---
-out=$(build_list | rofi -dmenu -i -p "Spotlight" -sync \
+# Ensure cache exists or rebuild in background if older than 5 minutes (300 seconds)
+if [ -f "$CACHE_FILE" ]; then
+    cache_age=$(($(date +%s) - $(stat -c %Y "$CACHE_FILE" 2>/dev/null || echo 0)))
+    if [ "$cache_age" -gt 300 ]; then
+        (build_full_cache) &>/dev/null &
+    fi
+else
+    build_full_cache
+fi
+
+# --- Launch rofi (instant display from cache, using wallust theme & icons) ---
+out=$(cat "$CACHE_FILE" | rofi -dmenu -i -show-icons -p "Spotlight" \
     -theme "$ROFI_THEME" \
-    -theme-str 'listview { columns: 1; lines: 12; spacing: 2px; padding: 6px; flow: vertical; } window { width: 620px; } element { orientation: horizontal; padding: 8px 12px; spacing: 12px; } element-icon { size: 22px; vertical-align: 0.5; } element-text { horizontal-align: 0; vertical-align: 0.5; text-color: @fg0; } entry { placeholder: "Search apps, files, folders or the web..."; }' \
+    -theme-str 'listview { columns: 1; lines: 10; spacing: 4px; padding: 6px; flow: vertical; } window { width: 640px; } element { orientation: horizontal; padding: 8px 12px; spacing: 12px; border: 0px; border-radius: 6px; } element-icon { size: 24px; vertical-align: 0.5; } element-text { horizontal-align: 0; vertical-align: 0.5; text-color: inherit; } entry { placeholder: "Search apps, files, folders or the web..."; }' \
     -format $'s\tf' -sep $'\n')
 
 [ -z "$out" ] && exit 0
@@ -142,3 +193,5 @@ case "$entry" in
         "$browser" "https://www.google.com/search?q=$q"
         ;;
 esac
+
+
