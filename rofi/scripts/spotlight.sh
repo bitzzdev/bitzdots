@@ -158,7 +158,7 @@ fi
 # --- Launch rofi (instant display from cache, using wallust theme & icons) ---
 out=$(cat "$CACHE_FILE" | rofi -dmenu -i -show-icons -p "Spotlight" \
     -theme "$ROFI_THEME" \
-    -theme-str 'listview { columns: 1; lines: 10; spacing: 4px; padding: 6px; flow: vertical; } window { width: 640px; } element { orientation: horizontal; padding: 8px 12px; spacing: 12px; border: 0px; border-radius: 6px; } element-icon { size: 24px; vertical-align: 0.5; } element-text { horizontal-align: 0; vertical-align: 0.5; text-color: inherit; } entry { placeholder: "Search apps, files, folders or the web..."; }' \
+    -theme-str 'listview { columns: 1; lines: 10; spacing: 4px; padding: 6px; flow: vertical; } window { width: 640px; border-radius: 0px; } element { orientation: horizontal; padding: 8px 12px; spacing: 12px; border: 0px; border-radius: 0px; } element selected { border-radius: 0px; } element-icon { size: 24px; vertical-align: 0.5; } element-text { horizontal-align: 0; vertical-align: 0.5; text-color: inherit; } entry { placeholder: "Search apps, files, folders or the web..."; }' \
     -format $'s\tf' -sep $'\n')
 
 [ -z "$out" ] && exit 0

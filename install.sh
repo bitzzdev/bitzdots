@@ -45,7 +45,7 @@ install_deps() {
 
             # Stage 1: guaranteed repo packages (core + extra) via pacman
             local repo_pkgs=(
-                waybar swaync rofi kitty cava
+                hyprland waybar swaync rofi kitty cava
                 hyprpicker wl-clipboard playerctl pavucontrol
                 polkit-kde-agent grim slurp cliphist hyprlock ffmpeg
                 btop pulsemixer wf-recorder python
@@ -104,7 +104,7 @@ install_deps() {
         fedora)
             log "Installing packages (Fedora)..."
             sudo dnf install -y \
-                waybar swaync wlogout rofi kitty cava \
+                hyprland waybar swaync wlogout rofi kitty cava \
                 awww hyprpicker wl-clipboard playerctl pavucontrol \
                 polkit-kde-agent grim slurp cliphist hyprlock ffmpeg \
                 inotify-tools fish fastfetch btop pulsemixer \
@@ -117,7 +117,7 @@ install_deps() {
         debian)
             log "Installing packages (Debian/Ubuntu)..."
             sudo apt install -y \
-                waybar swaync wlogout rofi kitty cava \
+                hyprland waybar swaync wlogout rofi kitty cava \
                 awww hyprpicker wl-clipboard playerctl pavucontrol \
                 polkit-kde-agent grim slurp cliphist hyprlock ffmpeg \
                 inotify-tools fish fastfetch btop pulsemixer \
@@ -132,20 +132,22 @@ install_deps() {
             echo "  services.awww.enable = true;"
             echo "  programs.waybar.enable = true;"
             echo "  programs.rofi.enable = true;"
+            echo "  programs.hyprland.enable = true;"
             echo "  environment.systemPackages = with pkgs; ["
-            echo "    wallust swaync wlogout kitty cava inotify-tools"
+            echo "    hyprland wallust swaync wlogout kitty cava inotify-tools"
             echo "    hyprpicker wl-clipboard playerctl pavucontrol"
             echo "    polkit-kde-agent grim slurp cliphist hyprlock ffmpeg"
             echo "    fish fastfetch btop pulsemixer wf-recorder python3"
             echo "    brightnessctl bluez bluez-utils libnotify"
             echo "    networkmanager wireplumber pipewire-pulse"
-    echo "    curl jq imagemagick nautilus wofi papirus-icon-theme"
-    echo "    qt5ct qt6ct"
-    echo "  ];"
+            echo "    curl jq imagemagick nautilus wofi papirus-icon-theme"
+            echo "    qt5ct qt6ct"
+            echo "  ];"
             echo "  services.bluetooth.enable = true;"
             ;;
         *)
             warn "Unknown distro. Please install manually:"
+            echo "  - hyprland (window manager)"
             echo "  - wallust (https://github.com/explosion-mental/wallust)"
             echo "  - waybar, swaync, wlogout, rofi, kitty, cava"
             echo "  - awww, hyprpicker, wl-clipboard, playerctl"
