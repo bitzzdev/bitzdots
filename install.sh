@@ -670,10 +670,17 @@ if command -v gsettings &>/dev/null; then
     gsettings set org.gnome.desktop.interface color-scheme prefer-dark 2>/dev/null || true
 fi
 
-# Clean up stale browser policy files/desktop overrides from previous versions
-sudo rm -rf /etc/chromium/policies/managed \
-            /etc/opt/chrome/policies/managed \
-            /etc/brave/policies/managed 2>/dev/null || true
+# Prepare Chromium policy directories for BrowserThemeColor enterprise policy
+log "Setting up Chromium browser theme policy directories..."
+for policy_dir in /etc/brave/policies/managed \
+                 /etc/opt/chrome/policies/managed \
+                 /etc/chromium/policies/managed \
+                 /etc/opt/edge/policies/managed \
+                 /etc/vivaldi/policies/managed \
+                 /etc/thorium/policies/managed; do
+    sudo mkdir -p "$policy_dir" 2>/dev/null || true
+    sudo chmod 777 "$policy_dir" 2>/dev/null || true
+done
 rm -f "$HOME/.local/share/applications/brave-browser.desktop" \
       "$HOME/.local/share/applications/chromium.desktop" \
       "$HOME/.local/share/applications/google-chrome.desktop" 2>/dev/null || true

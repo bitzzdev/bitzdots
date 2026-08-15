@@ -23,6 +23,7 @@ WALLUST_OUTPUTS=(
     "rofi/theme-generated.rasi"
     "wallust/env"
     "wallust/browser-colors.css"
+    "wallust/chromium-theme.json"
     "rofi/themes/wallpaper-grid.rasi"
     "rofi/themes/power.rasi"
     "rofi/icons/lock.svg"

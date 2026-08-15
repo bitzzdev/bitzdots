@@ -34,6 +34,9 @@ env.target = "~/.config/wallust/env"
 browser_colors.template = "browser-colors.css.j2"
 browser_colors.target = "~/.config/wallust/browser-colors.css"
 
+chromium_theme.template = "chromium-theme.json.j2"
+chromium_theme.target = "~/.config/wallust/chromium-theme.json"
+
 wallpaper_grid.template = "wallpaper-grid.rasi.j2"
 wallpaper_grid.target = "~/.config/rofi/themes/wallpaper-grid.rasi"
 

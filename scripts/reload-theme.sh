@@ -34,4 +34,36 @@ if command -v hyprctl &>/dev/null && [ -f "$CONFIG_DIR/hypr/colors.lua" ]; then
     echo "   Hyprland border colors updated"
 fi
 
+# --- Chromium BrowserThemeColor Enterprise Policy Sync ---
+if [ -f "$CONFIG_DIR/wallust/chromium-theme.json" ]; then
+    DEFAULTS_FILE="$CONFIG_DIR/hypr/defaults.lua"
+    browser="brave-origin"
+    if [ -f "$DEFAULTS_FILE" ]; then
+        _v=$(sed -n 's/^BROWSER\s*=\s*"\(.*\)"/\1/p' "$DEFAULTS_FILE" | head -1)
+        [ -n "$_v" ] && browser="$_v"
+    fi
+    unset _v
+
+    target_dirs=()
+    case "$browser" in
+        *brave*)    target_dirs=("/etc/brave/policies/managed") ;;
+        *chrome*)   target_dirs=("/etc/opt/chrome/policies/managed") ;;
+        *chromium*) target_dirs=("/etc/chromium/policies/managed") ;;
+        *edge*)     target_dirs=("/etc/opt/edge/policies/managed") ;;
+        *vivaldi*)  target_dirs=("/etc/vivaldi/policies/managed") ;;
+        *thorium*)  target_dirs=("/etc/thorium/policies/managed") ;;
+        *)          target_dirs=("/etc/brave/policies/managed" "/etc/opt/chrome/policies/managed" "/etc/chromium/policies/managed") ;;
+    esac
+
+    for target_dir in "${target_dirs[@]}"; do
+        mkdir -p "$target_dir" 2>/dev/null || true
+        if cp "$CONFIG_DIR/wallust/chromium-theme.json" "$target_dir/color.json" 2>/dev/null; then
+            echo "   Chromium policy theme updated ($target_dir/color.json)"
+        elif command -v sudo &>/dev/null && sudo -n true 2>/dev/null; then
+            sudo cp "$CONFIG_DIR/wallust/chromium-theme.json" "$target_dir/color.json" 2>/dev/null || true
+            echo "   Chromium policy theme updated via sudo ($target_dir/color.json)"
+        fi
+    done
+fi
+
 echo ":: Theme reload complete!"
