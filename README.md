@@ -34,6 +34,9 @@
 
 ---
 
+> [!WARNING]
+> **Repository Renaming Notice**: This repository will be renamed to **DEVdots** soon!
+
 bitzdots is a **lean, automated theming system** for Hyprland on Wayland. Change your wallpaper, and every component — status bar, terminal, launcher, notifications, logout screen, audio visualizer, even Qt/KDE apps — instantly adapts to match.
 
 Built for **low-end hardware** without sacrificing usability. The full stack (Hyprland + waybar + swaync) idles under **300MB RAM**, with aggressive CPU optimizations to keep fans quiet on older machines.
@@ -100,6 +103,7 @@ Full reference: **[docs/keybindings.md](docs/keybindings.md)**
 | [Scripts](docs/scripts.md) | All utility scripts documented |
 | [Performance](docs/performance.md) | Low-end optimization guide |
 | [Customization](docs/customization.md) | Add new components, modify themes |
+| [DEVos Aliases](docs/devos-aliases.md) | Arch Linux `dev` shortcuts & pacman aliases |
 | [FAQ](docs/faq.md) | Common issues and solutions |
 
 ## Directory Structure
