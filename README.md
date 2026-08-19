@@ -24,10 +24,16 @@
 
   <p>
     <a href="https://github.com/bitzzdev/bitzdots">
-      <img src="ss/ss1.png" alt="Screenshot 1" width="45%">
+      <img src="ss/ss3.png" alt="Screenshot 1" width="45%">
     </a>
     <a href="https://github.com/bitzzdev/bitzdots">
       <img src="ss/ss2.png" alt="Screenshot 2" width="45%">
+    </a>
+    <a href="https://github.com/bitzzdev/bitzdots">
+      <img src="ss/ss1.png" alt="Screenshot 3" width="45%">
+    </a>
+    <a href="https://github.com/bitzzdev/bitzdots">
+      <img src="ss/ss4.png" alt="Screenshot 4" width="45%">
     </a>
   </p>
 </div>
