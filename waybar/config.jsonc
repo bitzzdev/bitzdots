@@ -63,7 +63,7 @@
       "mode": "month",
       "on-scroll": 1,
       "format": {
-        "today": "<span color='#4E3F4C'><b><u>{}</u></b></span>"
+        "today": "<span color='#695E8E'><b><u>{}</u></b></span>"
       }
     }
   },

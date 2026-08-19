@@ -11,7 +11,7 @@ Select wallpaper
       ↓
 wallust run wallpaper.jpg
       ↓
-Generates 16-color palette (fastresize backend, dark16 palette)
+Generates 16-color palette (fastresize backend, saliencedark16 palette, salience colorspace)
       ↓
 25 Jinja2 templates processed
       ↓
