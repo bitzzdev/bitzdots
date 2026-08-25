@@ -23,7 +23,7 @@ The installer auto-detects your distro and:
 3. Creates screenshot/recording directories and wallpaper directories
 4. Links all configs into `~/.config/`
 5. Sets up the runcat-text module (venv + font)
-6. Installs the `wallust-cache-daemon` systemd user service
+6. Installs the `matugen-cache-daemon` systemd user service
 7. Generates an initial theme from your default wallpaper
 
 ## Manual Install
@@ -46,7 +46,7 @@ sudo pacman -S waybar swaync rofi kitty cava hyprpicker wl-clipboard \
   fish fastfetch qt5ct qt6ct
 
 # AUR (using paru or yay)
-paru -S wlogout wallust bluetui awww impala ttf-jetbrains-mono-nerd
+paru -S wlogout matugen bluetui awww impala ttf-jetbrains-mono-nerd
 ```
 
 </details>
@@ -63,7 +63,7 @@ sudo dnf install waybar swaync wlogout rofi kitty cava awww hyprpicker \
   pipewire-pulseaudio curl jq nautilus wofi papirus-icon-theme \
   qt5ct qt6ct
 
-cargo install wallust bluetui
+cargo install matugen bluetui
 ```
 
 </details>
@@ -79,7 +79,7 @@ sudo apt install waybar swaync wlogout rofi kitty cava awww hyprpicker \
   libnotify-bin network-manager wireplumber pipewire-pulse curl jq \
   nautilus wofi papirus-icon-theme qt5ct qt6ct
 
-cargo install wallust bluetui
+cargo install matugen bluetui
 ```
 
 </details>
@@ -95,7 +95,7 @@ cargo install wallust bluetui
     wl-clipboard playerctl pavucontrol polkit-kde-agent
     grim slurp cliphist hyprlock ffmpeg btop
     inotify-tools imagemagick fastfetch fish
-    wallust python3
+    matugen python3
   ];
 }
 ```
@@ -147,14 +147,14 @@ ln -sf "$DOTFILES_DIR/cava/config" "$CONFIG_DIR/cava/config"
 ln -sf "$DOTFILES_DIR/wlogout/style.css" "$CONFIG_DIR/wlogout/style.css"
 ln -sf "$DOTFILES_DIR/wlogout/layout" "$CONFIG_DIR/wlogout/layout"
 
-# Wallust (config + templates + scripts)
-mkdir -p "$CONFIG_DIR/wallust/templates"
-ln -sf "$DOTFILES_DIR/wallust/wallust.toml" "$CONFIG_DIR/wallust/wallust.toml"
-for t in "$DOTFILES_DIR/wallust/templates"/*; do
-  ln -sf "$t" "$CONFIG_DIR/wallust/templates/"
+# Matugen (config + templates + scripts)
+mkdir -p "$CONFIG_DIR/matugen/templates"
+ln -sf "$DOTFILES_DIR/matugen/config.toml" "$CONFIG_DIR/matugen/config.toml"
+for t in "$DOTFILES_DIR/matugen/templates"/*; do
+  ln -sf "$t" "$CONFIG_DIR/matugen/templates/"
 done
 for s in "$DOTFILES_DIR/scripts"/*.sh; do
-  ln -sf "$s" "$CONFIG_DIR/wallust/$(basename "$s")"
+  ln -sf "$s" "$CONFIG_DIR/matugen/$(basename "$s")"
 done
 
 # GTK / Qt / fish / fastfetch
@@ -170,10 +170,10 @@ ln -sf "$DOTFILES_DIR/fastfetch/bitz.txt" "$CONFIG_DIR/fastfetch/bitz.txt"
 
 ```bash
 mkdir -p "$CONFIG_DIR/systemd/user"
-cp "$DOTFILES_DIR/systemd/user/wallust-cache-daemon.service" \
-   "$CONFIG_DIR/systemd/user/wallust-cache-daemon.service"
+cp "$DOTFILES_DIR/systemd/user/matugen-cache-daemon.service" \
+   "$CONFIG_DIR/systemd/user/matugen-cache-daemon.service"
 systemctl --user daemon-reload
-systemctl --user enable --now wallust-cache-daemon.service
+systemctl --user enable --now matugen-cache-daemon.service
 ```
 
 ### 4. Install Font
@@ -188,8 +188,8 @@ paru -S ttf-jetbrains-mono-nerd
 ### 5. Generate Initial Theme
 
 ```bash
-wallust run ~/Pictures/Wallpapers/your-wallpaper.jpg \
-  --config-dir ~/.config/wallust
+matugen image ~/Pictures/Wallpapers/your-wallpaper.jpg --config ~/.config/matugen/config.toml \
+  --config-dir ~/.config/matugen
 ```
 
 ## Post-Installation Checklist
@@ -201,7 +201,7 @@ wallust run ~/Pictures/Wallpapers/your-wallpaper.jpg \
 - [ ] `SUPER + SHIFT + W` opens the wallpaper picker
 - [ ] Changing the wallpaper updates all colors
 - [ ] Notifications appear; control center opens with `SUPER + N`
-- [ ] `systemctl --user status wallust-cache-daemon.service` shows running
+- [ ] `systemctl --user status matugen-cache-daemon.service` shows running
 - [ ] All apps default to dark theme (GTK, Qt, kitty, etc.)
 
 ## Troubleshooting

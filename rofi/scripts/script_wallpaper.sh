@@ -5,7 +5,7 @@ WALL_DIR="$HOME/wallpapers"
 THEME_GRID="$HOME/.config/rofi/themes/wallpaper-grid.rasi"
 
 # RUTA ESPECÍFICA SOLICITADA
-STYLE_TETO="/home/bitz/.config/rofi/launchers/type-6/style-4.rasi"
+STYLE_TETO="/home/dev/.config/rofi/launchers/type-6/style-4.rasi"
 
 # 1. Verificar si awww-daemon está activo
 if ! pgrep -x "awww-daemon" > /dev/null; then
@@ -38,7 +38,7 @@ if [ -n "$selected" ]; then
         --transition-duration 2 \
         --transition-fps 60
 
-    ln -sf "$FULL_PATH" /home/bitz/.cache/current_wallpaper.png
+    ln -sf "$FULL_PATH" /home/dev/.cache/current_wallpaper.png
 
     # Vincular con style-4.rasi inyectando la nueva ruta en la línea de background-image
     # Esto modifica la línea 56 del archivo proporcionado 

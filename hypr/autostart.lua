@@ -14,10 +14,10 @@ hl.on("hyprland.start", function()
 
     -- Ensure WiFi is up: wait for NetworkManager, then reconnect if needed.
     -- Prevents the "strikethrough WiFi" waybar icon and impala crashes on boot.
-    hl.exec_cmd("bash -c 'sleep 3 && ~/.config/wallust/wifi-fix.sh &'")
+    hl.exec_cmd("bash -c 'sleep 3 && ~/.config/matugen/wifi-fix.sh &'")
 
-    -- Wallust palette cache daemon runs as a systemd user service
-    -- (wallust-cache-daemon.service) — no need to start it here
+    -- Matugen palette cache daemon runs as a systemd user service
+    -- (matugen-cache-daemon.service) — no need to start it here
 
     -- Restart portal to prevent CPU loop (known xdg-desktop-portal-hyprland 1.4.x bug)
     hl.exec_cmd("bash -c 'sleep 3 && systemctl --user restart xdg-desktop-portal-hyprland &>/dev/null'")

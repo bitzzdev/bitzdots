@@ -6,13 +6,13 @@ set -euo pipefail
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
 WALL_DIR="${WALLPAPER_DIR:-$HOME/Pictures/Wallpapers}"
 CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}"
-THEME_CACHE="$CACHE_DIR/wallust/themes"
-THUMB_DIR="$CACHE_DIR/wallust-thumbs"
+THEME_CACHE="$CACHE_DIR/matugen/themes"
+THUMB_DIR="$CACHE_DIR/matugen-thumbs"
 LIVE_DIR="$WALL_DIR/live"
 LOCK_FILE="$THEME_CACHE/daemon.lock"
-LOG_TAG="wallust-daemon"
+LOG_TAG="matugen-daemon"
 
-WALLUST_OUTPUTS=(
+MATUGEN_OUTPUTS=(
     "waybar/style.css"
     "waybar/config.jsonc"
     "swaync/style.css"
@@ -21,9 +21,9 @@ WALLUST_OUTPUTS=(
     "kitty/colors.conf"
     "cava/themes/generated"
     "rofi/theme-generated.rasi"
-    "wallust/env"
-    "wallust/browser-colors.css"
-    "wallust/chromium-theme.json"
+    "matugen/env"
+    "matugen/browser-colors.css"
+    "matugen/chromium-theme.json"
     "rofi/themes/wallpaper-grid.rasi"
     "rofi/themes/power.rasi"
     "rofi/icons/lock.svg"
@@ -82,7 +82,7 @@ cache_valid() {
 
     # Every expected output must exist in cache (not just .done)
     local cache_dir; cache_dir=$(cache_dir_for "$img")
-    for output in "${WALLUST_OUTPUTS[@]}"; do
+    for output in "${MATUGEN_OUTPUTS[@]}"; do
         [ -f "$cache_dir/$output" ] || return 1
     done
 
@@ -116,10 +116,10 @@ clear_skip() {
     rm -f "$(skip_marker_for "$img")"
 }
 
-# Extract a single frame from a video for wallust colour extraction
+# Extract a single frame from a video for matugen colour extraction
 extract_frame() {
     local video="$1"
-    local frame; frame=$(mktemp /tmp/wallust-frame-XXXXXX.jpg)
+    local frame; frame=$(mktemp /tmp/matugen-frame-XXXXXX.jpg)
     ffmpeg -i "$video" -vframes 1 -vf "scale=320:-1" "$frame" -y 2>/dev/null || {
         rm -f "$frame"
         return 1
@@ -148,8 +148,8 @@ generate_palette() {
     mkdir -p "$cache_dir"
 
     local backup_dir
-    backup_dir=$(mktemp -d /tmp/wallust-daemon-backup-XXXXXX)
-    for output in "${WALLUST_OUTPUTS[@]}"; do
+    backup_dir=$(mktemp -d /tmp/matugen-daemon-backup-XXXXXX)
+    for output in "${MATUGEN_OUTPUTS[@]}"; do
         local src="$CONFIG_DIR/$output"
         if [ -f "$src" ]; then
             mkdir -p "$(dirname "$backup_dir/$output")"
@@ -157,8 +157,8 @@ generate_palette() {
         fi
     done
 
-    if ! timeout 30 wallust run "$img" --config-dir "$CONFIG_DIR/wallust" -q 2>/dev/null; then
-        for output in "${WALLUST_OUTPUTS[@]}"; do
+    if ! timeout 30 matugen image "$img" --config "$CONFIG_DIR/matugen/config.toml" -q 2>/dev/null; then
+        for output in "${MATUGEN_OUTPUTS[@]}"; do
             local src="$backup_dir/$output"
             local dst="$CONFIG_DIR/$output"
             if [ -f "$src" ]; then
@@ -170,7 +170,7 @@ generate_palette() {
         return 1
     fi
 
-    for output in "${WALLUST_OUTPUTS[@]}"; do
+    for output in "${MATUGEN_OUTPUTS[@]}"; do
         local src="$CONFIG_DIR/$output"
         if [ -f "$src" ]; then
             mkdir -p "$(dirname "$cache_dir/$output")"
@@ -178,7 +178,7 @@ generate_palette() {
         fi
     done
 
-    for output in "${WALLUST_OUTPUTS[@]}"; do
+    for output in "${MATUGEN_OUTPUTS[@]}"; do
         local src="$backup_dir/$output"
         local dst="$CONFIG_DIR/$output"
         if [ -f "$src" ]; then

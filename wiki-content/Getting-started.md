@@ -46,7 +46,7 @@ After running the installer, log out of your current Hyprland session and log ba
 Press `SUPER + SHIFT + W` to open the wallpaper picker, or run:
 
 ```bash
-~/.config/wallust/wallpaper-select.sh
+~/.config/matugen/wallpaper-select.sh
 ```
 
 Select an image — the theme generates automatically and all components update.
@@ -72,7 +72,7 @@ Full list: [Keybindings](keybindings.md)
 ### 4. Customize
 
 - **Change colors**: Just change the wallpaper. Everything follows
-- **Modify templates**: Edit files in `~/.config/wallust/templates/`
+- **Modify templates**: Edit files in `~/.config/matugen/templates/`
 - **Add new components**: See [Customization](customization.md)
 
 ## First-Time Tweaks

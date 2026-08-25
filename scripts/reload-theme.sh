@@ -4,8 +4,10 @@ CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
 
 echo ":: Theme files updated..."
 
-# Source environment variables from wallust
-if [ -f "$CONFIG_DIR/wallust/env" ]; then
+# Source environment variables from matugen
+if [ -f "$CONFIG_DIR/matugen/env" ]; then
+    source "$CONFIG_DIR/matugen/env"
+elif [ -f "$CONFIG_DIR/wallust/env" ]; then
     source "$CONFIG_DIR/wallust/env"
 fi
 
@@ -35,7 +37,14 @@ if command -v hyprctl &>/dev/null && [ -f "$CONFIG_DIR/hypr/colors.lua" ]; then
 fi
 
 # --- Chromium BrowserThemeColor Enterprise Policy Sync ---
-if [ -f "$CONFIG_DIR/wallust/chromium-theme.json" ]; then
+chromium_theme=""
+if [ -f "$CONFIG_DIR/matugen/chromium-theme.json" ]; then
+    chromium_theme="$CONFIG_DIR/matugen/chromium-theme.json"
+elif [ -f "$CONFIG_DIR/wallust/chromium-theme.json" ]; then
+    chromium_theme="$CONFIG_DIR/wallust/chromium-theme.json"
+fi
+
+if [ -n "$chromium_theme" ]; then
     DEFAULTS_FILE="$CONFIG_DIR/hypr/defaults.lua"
     browser="brave-origin"
     if [ -f "$DEFAULTS_FILE" ]; then
@@ -57,10 +66,10 @@ if [ -f "$CONFIG_DIR/wallust/chromium-theme.json" ]; then
 
     for target_dir in "${target_dirs[@]}"; do
         mkdir -p "$target_dir" 2>/dev/null || true
-        if cp "$CONFIG_DIR/wallust/chromium-theme.json" "$target_dir/color.json" 2>/dev/null; then
+        if cp "$chromium_theme" "$target_dir/color.json" 2>/dev/null; then
             echo "   Chromium policy theme updated ($target_dir/color.json)"
         elif command -v sudo &>/dev/null && sudo -n true 2>/dev/null; then
-            sudo cp "$CONFIG_DIR/wallust/chromium-theme.json" "$target_dir/color.json" 2>/dev/null || true
+            sudo cp "$chromium_theme" "$target_dir/color.json" 2>/dev/null || true
             echo "   Chromium policy theme updated via sudo ($target_dir/color.json)"
         fi
     done

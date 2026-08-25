@@ -70,7 +70,7 @@ mainbox {
 imagebox {
     padding:                     20px;
     /* ↓↓↓ CAMBIA ESTA RUTA POR TU WALLPAPER ↓↓↓ */
-    background-image: url("/home/bitz/wallpapers/default.png", height);
+    background-image: url("/home/dev/wallpapers/default.png", height);
     background-color:            transparent;
     orientation:                 vertical;
     children:                    [ "inputbar", "dummy", "mode-switcher" ];

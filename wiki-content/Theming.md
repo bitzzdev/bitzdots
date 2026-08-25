@@ -2,14 +2,14 @@
 
 ## Auto-Coloring Pipeline
 
-bitzdots uses **wallust** to generate a complete color scheme from any wallpaper. The theming pipeline is fully automatic.
+bitzdots uses **matugen** to generate a complete color scheme from any wallpaper. The theming pipeline is fully automatic.
 
 ### How It Works
 
 ```
 Select wallpaper
       ↓
-wallust run wallpaper.jpg
+matugen image wallpaper.jpg --config ~/.config/matugen/config.toml
       ↓
 Generates 16-color palette (fastresize backend, saliencedark16 palette, salience colorspace)
       ↓
@@ -26,7 +26,7 @@ Configs written to 20+ files:
   ├── cava/themes/generated
   ├── hypr/hyprlock.conf
   ├── qt6ct/qt6ct.conf, kdeglobals, bitzdots.colors
-  └── wallust/env + browser-colors.css
+  └── matugen/env + browser-colors.css
       ↓
 reload-theme.sh
       ↓
@@ -35,7 +35,7 @@ All apps pick up new colors instantly
 
 ## The 25 Templates
 
-The `wallust/templates/` directory contains a Jinja2 template for every themed component:
+The `matugen/templates/` directory contains a Jinja2 template for every themed component:
 
 | Template | Target | Purpose |
 |----------|--------|---------|
@@ -62,12 +62,12 @@ The `wallust/templates/` directory contains a Jinja2 template for every themed c
 | `kdeglobals.j2` | `kdeglobals` | KDE colors |
 | `qt6ct.conf.j2` | `qt6ct/qt6ct.conf` | Qt6 theme |
 | `bitzdots.colors.j2` | `~/.local/share/color-schemes/bitzdots.colors` | KDE scheme |
-| `wallust-env.j2` | `wallust/env` | Color environment variables |
-| `browser-colors.css.j2` | `wallust/browser-colors.css` | Browser CSS |
+| `matugen-env.j2` | `matugen/env` | Color environment variables |
+| `browser-colors.css.j2` | `matugen/browser-colors.css` | Browser CSS |
 
 ## Template Variables
 
-Templates use wallust's Jinja2 syntax with 16 colors:
+Templates use matugen's Jinja2 syntax with 16 colors:
 
 ```jinja
 {{background}}    ← Main background
@@ -85,7 +85,7 @@ Templates use wallust's Jinja2 syntax with 16 colors:
 
 ## Cache Daemon
 
-`wallust-cache-daemon.service` (systemd user service):
+`matugen-cache-daemon.service` (systemd user service):
 
 1. **Watches** `~/Pictures/Wallpapers/` and `~/Pictures/Wallpapers/live/` via `inotifywait`
 2. **Debounces** rapid file changes
@@ -93,22 +93,22 @@ Templates use wallust's Jinja2 syntax with 16 colors:
 4. **Skips** problematic images with a 24-hour failure cooldown
 5. **Uses file locking** to prevent concurrent runs
 
-This makes wallpaper switching instant — no waiting for wallust to run.
+This makes wallpaper switching instant — no waiting for matugen to run.
 
 ## Changing Theme
 
 Simply run:
 
 ```bash
-wallust run /path/to/new-wallpaper.jpg --config-dir ~/.config/wallust
-~/.config/wallust/reload-theme.sh
+matugen image /path/to/new-wallpaper.jpg --config ~/.config/matugen/config.toml
+~/.config/matugen/reload-theme.sh
 ```
 
-Or use the picker: `SUPER + SHIFT + W` (or `~/.config/wallust/wallpaper-select.sh`).
+Or use the picker: `SUPER + SHIFT + W` (or `~/.config/matugen/wallpaper-select.sh`).
 
 ## Backup/Restore Safety
 
-Before every theme generation, the current configs are backed up. If wallust fails, the previous theme is restored automatically — a bad wallpaper never breaks your setup.
+Before every theme generation, the current configs are backed up. If matugen fails, the previous theme is restored automatically — a bad wallpaper never breaks your setup.
 
 ## Wallpapers
 

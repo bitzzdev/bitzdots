@@ -1,0 +1,15 @@
+[Unit]
+Description=Matugen wallpaper palette cache daemon
+Documentation=https://github.com/InioX/matugen
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=%h/.config/matugen/matugen-cache-daemon.sh
+Restart=on-failure
+RestartSec=5
+Nice=19
+IOSchedulingClass=idle
+
+[Install]
+WantedBy=default.target

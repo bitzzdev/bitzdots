@@ -1,6 +1,6 @@
 # Waybar Modules
 
-Waybar is configured with **15 modules** in `waybar/config.jsonc`. Custom modules are styled by wallust so colors always match the wallpaper.
+Waybar is configured with **15 modules** in `waybar/config.jsonc`. Custom modules are styled by matugen so colors always match the wallpaper.
 
 ## Layout
 

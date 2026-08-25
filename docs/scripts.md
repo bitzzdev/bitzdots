@@ -34,7 +34,7 @@ Reference for all scripts in bitzdots.
 Applies the generated theme to all running components.
 
 ```bash
-~/.config/wallust/reload-theme.sh
+~/.config/matugen/reload-theme.sh
 ```
 
 **What it does:**
@@ -48,8 +48,8 @@ Applies the generated theme to all running components.
 Rofi-based wallpaper picker with grid thumbnails.
 
 ```bash
-~/.config/wallust/wallpaper-select.sh                    # Open picker UI
-~/.config/wallust/wallpaper-select.sh /path/to/image.jpg  # Direct set
+~/.config/matugen/wallpaper-select.sh                    # Open picker UI
+~/.config/matugen/wallpaper-select.sh /path/to/image.jpg  # Direct set
 ```
 
 **Features:**
@@ -64,17 +64,17 @@ Rofi-based wallpaper picker with grid thumbnails.
 One-shot pre-cache all wallpapers.
 
 ```bash
-~/.config/wallust/cache-wallpapers.sh
+~/.config/matugen/cache-wallpapers.sh
 ```
 
-Generates wallust palettes and ImageMagick thumbnails for every wallpaper in the directories.
+Generates matugen palettes and ImageMagick thumbnails for every wallpaper in the directories.
 
-### `wallust-cache-daemon.sh`
+### `matugen-cache-daemon.sh`
 
 Event-driven background cache daemon.
 
 ```bash
-~/.config/wallust/wallust-cache-daemon.sh
+~/.config/matugen/matugen-cache-daemon.sh
 ```
 
 **Features:**
@@ -89,7 +89,7 @@ Event-driven background cache daemon.
 
 Toggle fullscreen screen recording.
 ```bash
-~/.config/wallust/record-fullscreen.sh
+~/.config/matugen/record-fullscreen.sh
 ```
 
 - Uses `wf-recorder` with audio (pulse audio)
@@ -102,7 +102,7 @@ Toggle fullscreen screen recording.
 Toggle region screen recording.
 
 ```bash
-~/.config/wallust/record-region.sh
+~/.config/matugen/record-region.sh
 ```
 
 - Uses `slurp` for region selection + `wf-recorder` with audio
@@ -122,7 +122,7 @@ Blinking indicator for waybar recording module.
 Generates a basic `hyprlock.conf` from current wallpaper.
 
 ```bash
-~/.config/wallust/hyprlock-setup.sh
+~/.config/matugen/hyprlock-setup.sh
 ```
 
 - Uses current wallpaper as lock screen background
@@ -133,7 +133,7 @@ Generates a basic `hyprlock.conf` from current wallpaper.
 Boot-time WiFi stabilizer. Called from `hypr/autostart.lua` a few seconds after login.
 
 ```bash
-~/.config/wallust/wifi-fix.sh
+~/.config/matugen/wifi-fix.sh
 ```
 
 **What it does:**
@@ -178,7 +178,7 @@ exits when the menu closes, no background daemon.
   the typed query; pressing Enter with no matching row also does a web search
 - Apps launch via their `.desktop` entry; files/folders open in the default
   file explorer (`$FILE_EXPLORER`)
-- Uses the same wallust-generated rofi template theme as the launcher
+- Uses the same matugen-generated rofi template theme as the launcher
   (`launcher.rasi`); defaults are read from `hypr/defaults.lua`
   (`BROWSER`, `FILE_EXPLORER`)
 

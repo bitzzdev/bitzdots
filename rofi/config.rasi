@@ -183,6 +183,6 @@ configuration {
 
 //@theme "/usr/share/rofi/themes/Arc-Dark.rasi"
 
-//@theme "/home/bitz/.config/rofi/themes/squared-material-red.rasi"
+//@theme "/home/dev/.config/rofi/themes/squared-material-red.rasi"
 
 @theme "~/.config/rofi/theme-generated.rasi"

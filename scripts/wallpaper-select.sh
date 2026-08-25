@@ -1,15 +1,15 @@
 #!/bin/bash
-# Rofi wallpaper selector with automatic theme generation via wallust
+# Rofi wallpaper selector with automatic theme generation via matugen
 
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
 WALL_DIR="${WALLPAPER_DIR:-$HOME/Pictures/Wallpapers}"
 CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}"
-THEME_CACHE="$CACHE_DIR/wallust/themes"
+THEME_CACHE="$CACHE_DIR/matugen/themes"
 ROFI_THEME="$CONFIG_DIR/rofi/themes/wallpaper-grid.rasi"
 ROFI_POWER="$CONFIG_DIR/rofi/themes/power.rasi"
 LIVE_DIR="$WALL_DIR/live"
-THUMB_DIR="$CACHE_DIR/wallust-thumbs"
-LOG_DIR="$CACHE_DIR/wallust"
+THUMB_DIR="$CACHE_DIR/matugen-thumbs"
+LOG_DIR="$CACHE_DIR/matugen"
 LOG_FILE="$LOG_DIR/wallpaper-select.log"
 
 mkdir -p "$CACHE_DIR" "$THUMB_DIR" "$THEME_CACHE" "$LOG_DIR"
@@ -28,7 +28,7 @@ if [ ! -d "$WALL_DIR" ]; then
     exit 1
 fi
 
-WALLUST_OUTPUTS=(
+MATUGEN_OUTPUTS=(
     "waybar/style.css"
     "waybar/config.jsonc"
     "swaync/style.css"
@@ -37,9 +37,9 @@ WALLUST_OUTPUTS=(
     "kitty/colors.conf"
     "cava/themes/generated"
     "rofi/theme-generated.rasi"
-    "wallust/env"
-    "wallust/browser-colors.css"
-    "wallust/chromium-theme.json"
+    "matugen/env"
+    "matugen/browser-colors.css"
+    "matugen/chromium-theme.json"
     "rofi/themes/wallpaper-grid.rasi"
     "rofi/themes/power.rasi"
     "rofi/icons/lock.svg"
@@ -56,9 +56,9 @@ WALLUST_OUTPUTS=(
 )
 
 backup_theme() {
-    local backup_dir="$CACHE_DIR/wallust-backup"
+    local backup_dir="$CACHE_DIR/matugen-backup"
     rm -rf "$backup_dir"
-    for output in "${WALLUST_OUTPUTS[@]}"; do
+    for output in "${MATUGEN_OUTPUTS[@]}"; do
         local src="$CONFIG_DIR/$output"
         if [ -f "$src" ]; then
             local dst="$backup_dir/$output"
@@ -69,11 +69,11 @@ backup_theme() {
 }
 
 restore_theme() {
-    local backup_dir="$CACHE_DIR/wallust-backup"
+    local backup_dir="$CACHE_DIR/matugen-backup"
     if [ ! -d "$backup_dir" ]; then
         return
     fi
-    for output in "${WALLUST_OUTPUTS[@]}"; do
+    for output in "${MATUGEN_OUTPUTS[@]}"; do
         local src="$backup_dir/$output"
         local dst="$CONFIG_DIR/$output"
         if [ -f "$src" ]; then
@@ -85,7 +85,7 @@ restore_theme() {
 }
 
 clear_backup() {
-    rm -rf "$CACHE_DIR/wallust-backup"
+    rm -rf "$CACHE_DIR/matugen-backup"
 }
 
 apply_cached_theme() {
@@ -98,9 +98,9 @@ apply_cached_theme() {
     fi
 
     # Invalidate cache if templates changed since it was made
-    local template_dir="$CONFIG_DIR/wallust/templates"
+    local template_dir="$CONFIG_DIR/matugen/templates"
     local latest=0
-    for f in "$template_dir"/*.j2; do
+    for f in "$template_dir"/*; do
         [ -f "$f" ] || continue
         local t
         t=$(stat -c '%Y' "$f")
@@ -113,7 +113,7 @@ apply_cached_theme() {
         return 1
     fi
 
-    for output in "${WALLUST_OUTPUTS[@]}"; do
+    for output in "${MATUGEN_OUTPUTS[@]}"; do
         local src="$cache_dir/$output"
         local dst="$CONFIG_DIR/$output"
         if [ -f "$src" ]; then
@@ -130,7 +130,7 @@ cache_current_theme() {
     local cache_dir="$THEME_CACHE/$name"
 
     mkdir -p "$cache_dir"
-    for output in "${WALLUST_OUTPUTS[@]}"; do
+    for output in "${MATUGEN_OUTPUTS[@]}"; do
         local src="$CONFIG_DIR/$output"
         if [ -f "$src" ]; then
             mkdir -p "$(dirname "$cache_dir/$output")"
@@ -146,8 +146,8 @@ set_static() {
     local name
     name="$(basename "$img" | sed 's/\.[^.]*$//')"
 
-    if ! command -v wallust &>/dev/null; then
-        alert "wallust not installed" critical
+    if ! command -v matugen &>/dev/null; then
+        alert "matugen not installed" critical
         exit 1
     fi
 
@@ -172,7 +172,7 @@ set_static() {
     if ! apply_cached_theme "$name"; then
         alert "Generating theme..." normal "Calculating color palette..."
         backup_theme
-        if timeout 30 wallust run "$img" --config-dir "$CONFIG_DIR/wallust"; then
+        if timeout 30 matugen image "$img" --config "$CONFIG_DIR/matugen/config.toml"; then
             cache_current_theme "$name" || true
             clear_backup
         else
@@ -182,7 +182,7 @@ set_static() {
         fi
     fi
 
-    "$CONFIG_DIR/wallust/reload-theme.sh" || true
+    "$CONFIG_DIR/matugen/reload-theme.sh" || true
 
     alert "Theme updated" normal "Wallpaper and colors applied"
 
@@ -210,7 +210,7 @@ set_live() {
     pkill mpvpaper 2>/dev/null || true
     mpvpaper -o "loop no-audio" '*' "$video"
 
-    if command -v ffmpeg &>/dev/null && command -v wallust &>/dev/null; then
+    if command -v ffmpeg &>/dev/null && command -v matugen &>/dev/null; then
         local frame="$CACHE_DIR/live-frame.jpg"
         ffmpeg -i "$video" -vframes 1 "$frame" -y 2>/dev/null || true
         if [ -f "$frame" ]; then
@@ -218,7 +218,7 @@ set_live() {
             if ! apply_cached_theme "$name"; then
                 alert "Generating theme..." normal "Calculating color palette..."
                 backup_theme
-                if timeout 30 wallust run "$frame" --config-dir "$CONFIG_DIR/wallust"; then
+                if timeout 30 matugen image "$frame" --config "$CONFIG_DIR/matugen/config.toml"; then
                     cache_current_theme "$name" || true
                     clear_backup
                 else
@@ -227,7 +227,7 @@ set_live() {
                     return 1
                 fi
             fi
-            "$CONFIG_DIR/wallust/reload-theme.sh" || true
+            "$CONFIG_DIR/matugen/reload-theme.sh" || true
 
             alert "Live wallpaper" normal "$(basename "$video")"
 

@@ -1,6 +1,6 @@
 # bitzdots
 
-> Lean, performant Hyprland dotfiles with automatic wallust theming — optimized for low-end machines.
+> Lean, performant Hyprland dotfiles with automatic matugen theming — optimized for low-end machines.
 
 ## Quick Start
 
@@ -18,7 +18,7 @@ chmod +x install.sh
 
 ## Key Features
 
-- **Auto-coloring** — Pick any wallpaper; wallust generates 25 themed templates automatically across all apps
+- **Auto-coloring** — Pick any wallpaper; matugen generates 25 themed templates automatically across all apps
 - **Low-end optimized** — Full desktop stack (Hyprland + waybar + swaync) idles under 300MB RAM
 - **Rofi launchers** — App launcher, clipboard manager, power menu, wallpaper picker (grid with thumbnails)
 - **Waybar with 15 modules** — Workspaces, runcat, media, clock, CPU, memory, network, bluetooth, recording indicator, power profiles, brightness, notifications, tray, power
@@ -38,14 +38,14 @@ chmod +x install.sh
 ├── wlogout/           # Logout screen
 ├── kitty/             # Terminal config
 ├── cava/              # Audio visualizer
-├── wallust/           # Theming engine (25 Jinja2 templates)
+├── matugen/           # Theming engine (25 Jinja2 templates)
 ├── fish/              # Fish shell config
 ├── fastfetch/         # Fastfetch config with BITZ logo
 ├── scripts/           # 10 utility scripts
 ├── icons/             # Source SVG icons (linked to rofi)
 ├── environment.d/     # Qt environment variables
 ├── gtk/               # GTK3/4 dark theme settings
-└── systemd/           # User services (wallust cache daemon)
+└── systemd/           # User services (matugen cache daemon)
 ```
 
 ## Performance

@@ -1,6 +1,6 @@
 #!/bin/bash
 # ============================================================
-# bitzdots — Automated Installer with wallust theming
+# bitzdots — Automated Installer with matugen theming
 # ============================================================
 set -euo pipefail
 
@@ -53,7 +53,7 @@ install_deps() {
                 brightnessctl bluez bluez-utils libnotify networkmanager
                 wireplumber pipewire-pulse curl jq imagemagick
                 nautilus wofi papirus-icon-theme rust
-                qt5ct qt6ct
+                qt5ct qt6ct matugen
             )
             sudo pacman -S --needed --noconfirm "${repo_pkgs[@]}" || \
                 warn "Some repo packages failed — the rest were likely installed"
@@ -72,16 +72,16 @@ install_deps() {
                 fi
             }
 
-            for pkg in wlogout wallust bluetui awww impala; do
+            for pkg in wlogout bluetui awww impala matugen; do
                 if command -v "$pkg" &>/dev/null; then
                     continue
                 fi
                 log "Installing $pkg..."
                 if install_aur_pkg "$pkg"; then
                     ok "  $pkg installed"
-                elif [ "$pkg" = wallust ] && command -v cargo &>/dev/null; then
+                elif [ "$pkg" = matugen ] && command -v cargo &>/dev/null; then
                     warn "  $pkg AUR build failed — trying cargo..."
-                    cargo install wallust && ok "  wallust installed via cargo" || warn "  wallust install failed"
+                    cargo install matugen && ok "  matugen installed via cargo" || warn "  matugen install failed"
                 elif [ "$pkg" = bluetui ] && command -v cargo &>/dev/null; then
                     warn "  $pkg AUR build failed — trying cargo..."
                     cargo install bluetui && ok "  bluetui installed via cargo" || warn "  bluetui install failed"
@@ -113,6 +113,10 @@ install_deps() {
                 NetworkManager wireplumber pipewire-pulseaudio \
                 curl jq ImageMagick nautilus wofi papirus-icon-theme \
                 qt5ct qt6ct
+            if ! command -v matugen &>/dev/null && command -v cargo &>/dev/null; then
+                log "Installing matugen via cargo..."
+                cargo install matugen 2>/dev/null || warn "Could not install matugen via cargo"
+            fi
             ;;
         debian)
             log "Installing packages (Debian/Ubuntu)..."
@@ -126,6 +130,10 @@ install_deps() {
                 network-manager wireplumber pipewire-pulse \
                 curl jq imagemagick nautilus wofi papirus-icon-theme \
                 qt5ct qt6ct
+            if ! command -v matugen &>/dev/null && command -v cargo &>/dev/null; then
+                log "Installing matugen via cargo..."
+                cargo install matugen 2>/dev/null || warn "Could not install matugen via cargo"
+            fi
             ;;
         nixos)
             log "NixOS detected — add these to your configuration.nix:"
@@ -134,7 +142,7 @@ install_deps() {
             echo "  programs.rofi.enable = true;"
             echo "  programs.hyprland.enable = true;"
             echo "  environment.systemPackages = with pkgs; ["
-            echo "    hyprland wallust swaync wlogout kitty cava inotify-tools"
+            echo "    hyprland matugen swaync wlogout kitty cava inotify-tools"
             echo "    hyprpicker wl-clipboard playerctl pavucontrol"
             echo "    polkit-kde-agent grim slurp cliphist hyprlock ffmpeg"
             echo "    fish fastfetch btop pulsemixer wf-recorder python3"
@@ -148,7 +156,7 @@ install_deps() {
         *)
             warn "Unknown distro. Please install manually:"
             echo "  - hyprland (window manager)"
-            echo "  - wallust (https://github.com/explosion-mental/wallust)"
+            echo "  - matugen (https://github.com/InioX/matugen)"
             echo "  - waybar, swaync, wlogout, rofi, kitty, cava"
             echo "  - awww, hyprpicker, wl-clipboard, playerctl"
             echo "  - pavucontrol, polkit-kde-agent, grim, slurp, cliphist"
@@ -236,28 +244,40 @@ setup_runcat() {
     ok "runcat-text setup complete"
 }
 
+cleanup_wallust() {
+    log "Cleaning up legacy wallust files and services..."
+    systemctl --user stop wallust-cache-daemon.service 2>/dev/null || true
+    systemctl --user disable wallust-cache-daemon.service 2>/dev/null || true
+    rm -f "${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user/wallust-cache-daemon.service"
+    rm -rf "$CONFIG_DIR/wallust"
+    rm -rf "$CACHE_DIR/wallust"
+    rm -rf "$CACHE_DIR/wallust-thumbs"
+    rm -rf "$CACHE_DIR/wallust-backup"
+    ok "Legacy wallust cleanup complete"
+}
+
 install_scripts() {
-    local scripts_dir="$CONFIG_DIR/wallust"
+    local scripts_dir="$CONFIG_DIR/matugen"
     mkdir -p "$scripts_dir/templates"
 
-    for s in reload-theme.sh wallpaper-select.sh cache-wallpapers.sh wallust-cache-daemon.sh record-fullscreen.sh record-region.sh recording-indicator.sh wifi-fix.sh; do
+    for s in reload-theme.sh wallpaper-select.sh cache-wallpapers.sh matugen-cache-daemon.sh record-fullscreen.sh record-region.sh recording-indicator.sh wifi-fix.sh; do
         ln -sf "$DOTFILES_DIR/scripts/$s" "$scripts_dir/$s"
     done
 
-    ln -sf "$DOTFILES_DIR/wallust/wallust.toml" "$scripts_dir/wallust.toml"
+    ln -sf "$DOTFILES_DIR/matugen/config.toml" "$scripts_dir/config.toml"
 
-    for t in "$DOTFILES_DIR/wallust/templates"/*; do
-        ln -sf "$t" "$scripts_dir/templates/"
+    for t in "$DOTFILES_DIR/matugen/templates"/*; do
+        [ -e "$t" ] && ln -sf "$t" "$scripts_dir/templates/"
     done
 
     mkdir -p "$HOME/.local/bin"
     ln -sf "$DOTFILES_DIR/scripts/hyprlogout" "$HOME/.local/bin/hyprlogout"
 
-    ok "Wallust scripts and templates linked"
+    ok "Matugen scripts and templates linked"
 }
 
 make_executable() {
-    for d in "$CONFIG_DIR/waybar/scripts" "$CONFIG_DIR/rofi/scripts" "$CONFIG_DIR/wallust"; do
+    for d in "$CONFIG_DIR/waybar/scripts" "$CONFIG_DIR/rofi/scripts" "$CONFIG_DIR/matugen"; do
         for s in "$d"/*.sh; do
             chmod +x "$s" 2>/dev/null || true
         done
@@ -307,7 +327,7 @@ install_gtk_config() {
 install_qt_config() {
     mkdir -p "$CONFIG_DIR/qt5ct"
     link_config "$DOTFILES_DIR/qt5ct/qt5ct.conf" "$CONFIG_DIR/qt5ct/qt5ct.conf" "qt5ct"
-    # qt6ct config is auto-generated by wallust from template
+    # qt6ct config is auto-generated by matugen from template
     ok "Dark theme enabled for GTK + Qt apps"
 }
 
@@ -397,17 +417,17 @@ add_keybind() {
     grep -q "wallpaper-select" "$keybind_file" 2>/dev/null && return
     echo "" >> "$keybind_file"
     echo "-- Wallpaper selector" >> "$keybind_file"
-    echo 'hl.bind("SUPER + SHIFT + W", hl.dsp.exec_cmd("~/.config/wallust/wallpaper-select.sh"))' >> "$keybind_file"
+    echo 'hl.bind("SUPER + SHIFT + W", hl.dsp.exec_cmd("~/.config/matugen/wallpaper-select.sh"))' >> "$keybind_file"
     ok "Keybind added: SUPER+SHIFT+W = wallpaper picker"
 }
 
 generate_initial_theme() {
-    command -v wallust &>/dev/null || { warn "wallust not installed — skipping theme generation"; return; }
+    command -v matugen &>/dev/null || { warn "matugen not installed — skipping theme generation"; return; }
 
     local initial_wall=""
     local img
     for img in $(find "$WALL_DIR" -maxdepth 1 -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \) | sort); do
-        if timeout 20 wallust run "$img" --config-dir "$CONFIG_DIR/wallust" -q 2>/dev/null; then
+        if timeout 20 matugen image "$img" --config "$CONFIG_DIR/matugen/config.toml" -q 2>/dev/null; then
             initial_wall="$img"
             break
         fi
@@ -438,18 +458,18 @@ generate_initial_theme() {
         ok "Theme generated from $(basename "$initial_wall")"
     else
         warn "Theme generation had issues - some output files missing"
-        warn "Run manually: wallust run \"$initial_wall\" --config-dir \"$CONFIG_DIR/wallust\""
+        warn "Run manually: matugen image \"$initial_wall\" --config \"$CONFIG_DIR/matugen/config.toml\""
     fi
 }
 
 install_systemd_services() {
     log "Installing systemd services..."
     mkdir -p "${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user"
-    cp "$DOTFILES_DIR/systemd/user/wallust-cache-daemon.service" \
-       "${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user/wallust-cache-daemon.service"
+    cp "$DOTFILES_DIR/systemd/user/matugen-cache-daemon.service" \
+       "${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user/matugen-cache-daemon.service"
     systemctl --user daemon-reload 2>/dev/null || true
-    systemctl --user enable --now wallust-cache-daemon.service 2>/dev/null || true
-    ok "wallust-cache-daemon service started"
+    systemctl --user enable --now matugen-cache-daemon.service 2>/dev/null || true
+    ok "matugen-cache-daemon service started"
 
     if command -v bluetoothctl &>/dev/null; then
         sudo rfkill unblock bluetooth 2>/dev/null || true
@@ -486,9 +506,9 @@ install_cargo_tools() {
         cargo install impala && ok "  impala installed" || warn "  impala install failed"
     fi
 
-    if ! command -v wallust &>/dev/null; then
-        log "Installing wallust via cargo..."
-        cargo install wallust && ok "  wallust installed" || warn "  wallust install failed"
+    if ! command -v matugen &>/dev/null; then
+        log "Installing matugen via cargo..."
+        cargo install matugen && ok "  matugen installed" || warn "  matugen install failed"
     fi
 }
 
@@ -497,7 +517,7 @@ verify_critical_tools() {
     local missing=()
     local tools=(
         "brightnessctl:brightnessctl:for display backlight control"
-        "wallust:wallust:for theme generation from wallpapers"
+        "matugen:matugen:for theme generation from wallpapers"
         "swaync:swaync:notification daemon"
         "notify-send:libnotify:for desktop notifications"
         "bluetoothctl:bluez-utils:Bluetooth control"
@@ -599,7 +619,7 @@ verify_theme_outputs() {
     done
 
     if [ "$all_ok" = false ]; then
-        warn "Some theme files are missing. Run: wallust run ~/Pictures/Wallpapers/<image> --config-dir $CONFIG_DIR/wallust"
+        warn "Some theme files are missing. Run: matugen image ~/Pictures/Wallpapers/<image> --config $CONFIG_DIR/matugen/config.toml"
     fi
 }
 
@@ -640,6 +660,7 @@ else
     install_deps
 fi
 
+cleanup_wallust
 setup_wallpapers
 setup_cache
 mkdir -p "$HOME/Pictures/Screenshots/Fullscreen" "$HOME/Pictures/Screenshots/Freeform" 2>/dev/null || true
@@ -724,11 +745,11 @@ echo -e "  ${YELLOW}Usage:${NC}"
 echo "    SUPER+SHIFT+W    — Open wallpaper picker"
 echo ""
 echo -e "  ${YELLOW}Or run manually:${NC}"
-echo "    ~/.config/wallust/wallpaper-select.sh"
+echo "    ~/.config/matugen/wallpaper-select.sh"
 echo ""
 echo -e "  ${YELLOW}Notes:${NC}"
 echo "    • Add wallpapers to $WALL_DIR/"
 echo "    • Add live wallpapers (.mp4/.webm/.gif) to $WALL_DIR/live/"
-echo "    • To manually generate theme: wallust run <wallpaper>"
+echo "    • To manually generate theme: matugen image <wallpaper>"
 echo "    • Install mpvpaper for live wallpaper support"
 echo ""

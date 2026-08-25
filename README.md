@@ -1,6 +1,6 @@
 <div align="center">
   <h1>bitzdots</h1>
-  <p><strong>Lean Hyprland dotfiles • Automatic wallust theming • Low-end optimized</strong></p>
+  <p><strong>Lean Hyprland dotfiles • Automatic matugen M3 theming • Low-end optimized</strong></p>
 
   <p>
     <a href="#-features">Features</a> •
@@ -49,16 +49,16 @@ Built for **low-end hardware** without sacrificing usability. The full stack (Hy
 
 ## Features
 
-- **🎨 Full-stack auto-theming** — One wallpaper change propagates to 20+ components via wallust (waybar, kitty, rofi, swaync, wlogout, cava, Hyprland borders, Qt/KDE, GTK, even browser CSS)
+- **🎨 Full-stack auto-theming** — One wallpaper change propagates to 20+ components via matugen M3 color extraction (waybar, kitty, rofi, swaync, wlogout, cava, Hyprland borders, Qt/KDE, GTK, even browser CSS)
 - **⚡ Event-driven cache daemon** — inotify-based background pre-generation means wallpaper switching is instant, not sluggish
 - **🖼 Live wallpaper support** — Static images with animated transitions (`awww`) and video wallpapers (`mpvpaper`) with automatic palette extraction
-- **🧩 25 Jinja2 templates** — Every themed component (including launcher, power, wallpaper-grid themes and 8 SVG icons) uses a template. Colors are consistent everywhere
+- **🧩 26 templates** — Every themed component (including launcher, power, wallpaper-grid themes and 8 SVG icons) uses a template. Colors are consistent everywhere
 - **🔧 Rofi-powered everything** — App launcher, clipboard manager (cliphist), power menu, wallpaper picker (grid with thumbnails), WiFi, Bluetooth, audio, system monitor — all keyboard-navigable
 - **🖥 Waybar with 15 modules** — Workspace batch display, runcat CPU animation, live media, recording indicator, brightness, power profiles, notification center toggle, system TUIs
 - **🔒 Full-screen + region recording** — wf-recorder with audio, start/stop toggle keybinds, saves to organized directories
 - **📸 Screenshots with clipboard** — Fullscreen (Print) and selection (SUPER+SHIFT+S) both save AND copy to clipboard
 - **🐟 Fish shell + fastfetch** — Minimal greeting-less shell, custom BITZ ASCII logo on startup
-- **🔄 Safe theme switching** — Backup/restore on every wallust run; if generation fails, previous theme is restored
+- **🔄 Safe theme switching** — Backup/restore on every matugen run; if generation fails, previous theme is restored
 - **🏞 Wallpaper cache daemon** — Monitors wallpaper directories with inotify, pre-generates palettes so switching is instant
 - **📦 Multi-distro installer** — Automated setup for Arch, Fedora, Debian/Ubuntu, and NixOS with `--with-deps` flag
 
@@ -105,7 +105,7 @@ Full reference: **[docs/keybindings.md](docs/keybindings.md)**
 | [Features](docs/features.md) | Complete feature breakdown |
 | [Keybindings](docs/keybindings.md) | All keyboard shortcuts |
 | [Waybar Modules](docs/waybar-modules.md) | Every module explained |
-| [Theming](docs/theming.md) | How wallust works, templates |
+| [Theming](docs/theming.md) | How matugen works, templates |
 | [Scripts](docs/scripts.md) | All utility scripts documented |
 | [Performance](docs/performance.md) | Low-end optimization guide |
 | [Customization](docs/customization.md) | Add new components, modify themes |
@@ -138,7 +138,7 @@ Full reference: **[docs/keybindings.md](docs/keybindings.md)**
 ├── wlogout/           # Logout screen
 ├── kitty/             # Terminal (themed)
 ├── cava/              # Audio visualizer (themed)
-├── wallust/           # Theming engine (25 templates)
+├── matugen/           # Theming engine (26 templates)
 ├── fish/              # Fish shell config
 ├── fastfetch/         # System fetch (custom logo)
 └── scripts/           # 10 utility scripts
@@ -162,9 +162,9 @@ Optimization strategies are documented in **[Performance](docs/performance.md)**
 
 ```
 Wallpaper image
-    ↓ wallust (fastresize backend)
-16-color palette
-    ↓ 25 Jinja2 templates
+    ↓ matugen (Material 3 palette extraction)
+Material 3 & base16 color schemes
+    ↓ 26 templates
 Config files for every component (20+ files)
     ↓ reload-theme.sh
 All apps pick up new colors instantly
@@ -173,7 +173,9 @@ All apps pick up new colors instantly
 ## Requirements
 
 - **Hyprland** (Wayland compositor)
-- **wallust** — color palette generator
+- **matugen** — Material 3 color palette generator
+- **inotify-tools** — for cache daemon
+- **Nerd Font** — icons (JetBrainsMono recommended)
 - **inotify-tools** — for cache daemon
 - **Nerd Font** — icons (JetBrainsMono recommended)
 

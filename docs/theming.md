@@ -6,7 +6,7 @@ How the automatic color theming pipeline works in bitzdots.
 
 ```
 Wallpaper image
-    ↓ wallust (fastresize backend, saliencedark16 palette, salience colorspace)
+    ↓ matugen (fastresize backend, saliencedark16 palette, salience colorspace)
 16-color palette (background, foreground, 8 accent colors, 8 terminal colors)
     ↓ 25 Jinja2 templates
 Config files for every component
@@ -18,7 +18,7 @@ All running apps pick up new colors
 
 ### 1. Color Extraction
 
-**wallust** analyzes your wallpaper image using the `fastresize` backend and `salience` colorspace to extract a `saliencedark16` palette — extracting from highest available salient/contrasting color to lowest:
+**matugen** analyzes your wallpaper image using the `fastresize` backend and `salience` colorspace to extract a `saliencedark16` palette — extracting from highest available salient/contrasting color to lowest:
 
 | Index | Usage |
 |-------|-------|
@@ -27,11 +27,11 @@ All running apps pick up new colors
 | `color1`-`color9` | Accent colors (active borders, highlights) |
 | `color8`-`color15` | Terminal ANSI colors |
 
-Contrast checking is enabled — wallust ensures text remains readable.
+Contrast checking is enabled — matugen ensures text remains readable.
 
 ### 2. Template Rendering
 
-25 Jinja2 templates in `wallust/templates/` use wallust color variables:
+25 Jinja2 templates in `matugen/templates/` use matugen color variables:
 
 ```jinja2
 {{background}}       → #1a1218
@@ -44,7 +44,7 @@ Contrast checking is enabled — wallust ensures text remains readable.
 Templates render into component config files:
 
 ```toml
-# wallust.toml snippet
+# config.toml snippet
 [waybar-css]
 template = "waybar.css.j2"
 target = "~/.config/waybar/style.css"
@@ -56,7 +56,7 @@ target = "~/.config/kitty/colors.conf"
 
 ### 3. Cache Daemon
 
-The `wallust-cache-daemon.service` runs at low priority (Nice=19) and:
+The `matugen-cache-daemon.service` runs at low priority (Nice=19) and:
 
 1. **Watches** `~/Pictures/Wallpapers/` and `~/Pictures/Wallpapers/live/` via `inotifywait`
 2. **Debounces** file changes (waits for stability)
@@ -64,13 +64,13 @@ The `wallust-cache-daemon.service` runs at low priority (Nice=19) and:
 4. **Skips** problematic images with a 24-hour cooldown to avoid repeating failures
 5. **Uses file locking** to prevent concurrent runs
 
-This means when you select a wallpaper from the picker, the theme applies instantly — no waiting for wallust to run.
+This means when you select a wallpaper from the picker, the theme applies instantly — no waiting for matugen to run.
 
 ### 4. Theme Reload
 
 When a wallpaper is changed, `reload-theme.sh`:
 
-1. Runs wallust to generate new configs from templates
+1. Runs matugen to generate new configs from templates
 2. Reloads swaync CSS (notifies swaync to re-read style.css)
 3. Updates Hyprland border colors from `colors.lua`
 4. Restarts waybar so all module colors refresh
@@ -80,15 +80,15 @@ When a wallpaper is changed, `reload-theme.sh`:
 Before every theme generation, the system:
 
 1. **Backs up** all current generated config files to a timestamped directory
-2. **Runs wallust** to generate new configs
+2. **Runs matugen** to generate new configs
 3. **On failure**: restores the previous backup, logs the error
 4. **On success**: keeps the backup for manual rollback
 
-This means a bad wallpaper or failed wallust run never breaks your theme.
+This means a bad wallpaper or failed matugen image never --config ~/.config/matugen/config.toml breaks your theme.
 
 ## Template Reference
 
-All 25 templates in `wallust/templates/`:
+All 25 templates in `matugen/templates/`:
 
 | Template | Target | Purpose |
 |---|---|---|
@@ -100,8 +100,8 @@ All 25 templates in `wallust/templates/`:
 | `kitty-colors.conf.j2` | `kitty/colors.conf` | Terminal colors |
 | `cava-colors.j2` | `cava/themes/generated` | Audio visualizer |
 | `rofi-colors.rasi.j2` | `rofi/theme-generated.rasi` | Launcher theme |
-| `wallust-env.j2` | `wallust/env` | Color env vars |
-| `browser-colors.css.j2` | `wallust/browser-colors.css` | Browser CSS |
+| `matugen-env.j2` | `matugen/env` | Color env vars |
+| `browser-colors.css.j2` | `matugen/browser-colors.css` | Browser CSS |
 | `hyprlock.conf.j2` | `hypr/hyprlock.conf` | Lock screen |
 | `kdeglobals.j2` | `kdeglobals` | KDE colors |
 | `qt6ct.conf.j2` | `qt6ct/qt6ct.conf` | Qt6 theme |
@@ -126,11 +126,11 @@ See [Customization](customization.md) for the step-by-step guide.
 
 ```bash
 # Regenerate from current wallpaper
-wallust run ~/.cache/current_wallpaper.png --config-dir ~/.config/wallust
+matugen image ~/.cache/current_wallpaper.png --config ~/.config/matugen/config.toml
 
 # Regenerate from a specific image
-wallust run ~/Pictures/Wallpapers/image.jpg --config-dir ~/.config/wallust
+matugen image ~/Pictures/Wallpapers/image.jpg --config ~/.config/matugen/config.toml
 
 # Apply the new theme
-~/.config/wallust/reload-theme.sh
+~/.config/matugen/reload-theme.sh
 ```
