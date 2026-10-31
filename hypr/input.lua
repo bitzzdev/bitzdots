@@ -8,15 +8,11 @@ hl.config({
         follow_mouse        = 1,
         mouse_refocus       = false,
         sensitivity         = 0,
-        accel_profile       = "",
         touchpad = {
             natural_scroll       = false,
             disable_while_typing = true,
             scroll_factor        = 1.0,
             clickfinger_behavior = true,
-        },
-        tablet = {
-            output = "",
         },
     },
 })
