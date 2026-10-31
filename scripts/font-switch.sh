@@ -8,16 +8,36 @@ CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
 DOTFILES_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 
 ensure_paper_mono() {
-    # Check if Paper Mono is installed
-    if fc-list :family 2>/dev/null | grep -qi "Paper Mono"; then
+    # Check if Paper Mono is installed globally or locally
+    if fc-list : family 2>/dev/null | grep -qi "Paper Mono"; then
         return 0
     fi
 
-    echo "Paper Mono not found. Downloading Paper Mono from GitHub..."
-    local font_dir="$HOME/.local/share/fonts/paper-mono"
-    mkdir -p "$font_dir"
-    local tmp_zip="/tmp/paper-mono.zip"
+    # Check direct system / user font directories
+    for dir in "/usr/local/share/fonts/paper-mono" "/usr/share/fonts/paper-mono" "$HOME/.local/share/fonts/paper-mono"; do
+        if [ -d "$dir" ] && [ -n "$(ls -A "$dir" 2>/dev/null)" ]; then
+            fc-cache -f "$dir" 2>/dev/null || true
+            return 0
+        fi
+    done
 
+    echo "Paper Mono not found. Downloading Paper Mono from GitHub..."
+
+    # Prefer global directory /usr/local/share/fonts if writable or accessible via sudo, else local user directory
+    local font_dir="/usr/local/share/fonts/paper-mono"
+    local use_sudo=false
+
+    if [ -w "/usr/local/share/fonts" ]; then
+        mkdir -p "$font_dir"
+    elif command -v sudo &>/dev/null && sudo -n true 2>/dev/null; then
+        sudo mkdir -p "$font_dir"
+        use_sudo=true
+    else
+        font_dir="$HOME/.local/share/fonts/paper-mono"
+        mkdir -p "$font_dir"
+    fi
+
+    local tmp_zip="/tmp/paper-mono.zip"
     if command -v curl &>/dev/null; then
         curl -fsSL -o "$tmp_zip" "https://github.com/paper-design/paper-mono/releases/latest/download/paper-mono-v1.000.zip" || \
         curl -fsSL -o "$tmp_zip" "https://github.com/paper-design/paper-mono/archive/refs/heads/main.zip"
@@ -27,13 +47,27 @@ ensure_paper_mono() {
     fi
 
     if [ -f "$tmp_zip" ]; then
+        local extract_dir="/tmp/paper-mono-extract"
+        rm -rf "$extract_dir"
+        mkdir -p "$extract_dir"
+
         if command -v bsdtar &>/dev/null; then
-            bsdtar -xf "$tmp_zip" -C "$font_dir" 2>/dev/null || true
+            bsdtar -xf "$tmp_zip" -C "$extract_dir" 2>/dev/null || true
         elif command -v unzip &>/dev/null; then
-            unzip -q -o "$tmp_zip" -d "$font_dir" 2>/dev/null || true
+            unzip -q -o "$tmp_zip" -d "$extract_dir" 2>/dev/null || true
         fi
         rm -f "$tmp_zip"
-        fc-cache -f "$font_dir" 2>/dev/null || true
+
+        if $use_sudo; then
+            sudo cp -rn "$extract_dir"/* "$font_dir/" 2>/dev/null || sudo cp -r "$extract_dir"/* "$font_dir/"
+            sudo chmod -R 644 "$font_dir"/* 2>/dev/null || true
+            sudo find "$font_dir" -type d -exec chmod 755 {} + 2>/dev/null || true
+            sudo fc-cache -f "$font_dir" 2>/dev/null || true
+        else
+            cp -rn "$extract_dir"/* "$font_dir/" 2>/dev/null || cp -r "$extract_dir"/* "$font_dir/"
+            fc-cache -f "$font_dir" 2>/dev/null || true
+        fi
+        rm -rf "$extract_dir"
         echo "Paper Mono installed successfully to $font_dir"
     else
         echo "Could not download Paper Mono automatically. Please install it manually from https://paper.design/mono"

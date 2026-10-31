@@ -93,8 +93,8 @@
   },
 
   "pulseaudio": {
-    "format": "{icon} {volume}%",
-    "format-muted": "\uF6A9",
+    "format": "<span font_desc='JetBrainsMono Nerd Font'>{icon}</span> {volume}%",
+    "format-muted": "<span font_desc='JetBrainsMono Nerd Font'>\uF6A9</span>",
     "format-icons": {
       "headphone": "\uF025",
       "hands-free": "\uF025",
@@ -111,14 +111,14 @@
 
   "cpu": {
     "interval": 5,
-    "format": "\uF2DB {usage}%",
+    "format": "<span font_desc='JetBrainsMono Nerd Font'>\uF2DB</span> {usage}%",
     "on-click": "~/.config/waybar/scripts/tui-cpu.sh",
     "tooltip": false
   },
 
   "memory": {
     "interval": 10,
-    "format": "\uEFC5 {percentage}%",
+    "format": "<span font_desc='JetBrainsMono Nerd Font'>\uEFC5</span> {percentage}%",
     "on-click": "kitty --class system-tui -e btop",
     "tooltip": false
   },

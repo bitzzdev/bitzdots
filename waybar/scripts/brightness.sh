@@ -72,7 +72,7 @@ get_light() {
 }
 
 if ! get_brightnessctl && ! get_sysfs && ! get_light; then
-    printf '{"text":" 󰃜 N/A","tooltip":"Brightness: N/A","class":""}\n'
+    printf '{"text":" <span font_desc=\x27JetBrainsMono Nerd Font\x27>󰃜</span> N/A","tooltip":"Brightness: N/A","class":""}\n'
     exit 0
 fi
 
@@ -88,5 +88,5 @@ else
     icon="󰃜"
 fi
 
-printf '{"text":"%s %s%%","tooltip":"Brightness: %s%%","class":""}\n' \
+printf '{"text":"<span font_desc=\x27JetBrainsMono Nerd Font\x27>%s</span> %s%%","tooltip":"Brightness: %s%%","class":""}\n' \
     "$icon" "$pct" "$pct"
