@@ -1,9 +1,4 @@
 #!/bin/bash
-CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
-if [ -f "$CONFIG_DIR/fzf/system-power.sh" ]; then
-    exec "$CONFIG_DIR/fzf/system-power.sh"
-fi
-
 ICON_DIR="$HOME/.config/rofi/icons"
 
 choice=$(

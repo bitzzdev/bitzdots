@@ -22,7 +22,6 @@ MATUGEN_OUTPUTS=(
     "cava/themes/generated"
     "rofi/theme-generated.rasi"
     "matugen/env"
-    "matugen/fzf-colors.sh"
     "matugen/browser-colors.css"
     "matugen/chromium-theme.json"
     "rofi/themes/wallpaper-grid.rasi"

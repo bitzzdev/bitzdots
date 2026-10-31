@@ -38,7 +38,6 @@ MATUGEN_OUTPUTS=(
     "cava/themes/generated"
     "rofi/theme-generated.rasi"
     "matugen/env"
-    "matugen/fzf-colors.sh"
     "matugen/browser-colors.css"
     "matugen/chromium-theme.json"
     "rofi/themes/wallpaper-grid.rasi"
@@ -272,46 +271,17 @@ pick_static() {
     fi
 
     local selected
-    if [ -t 0 ] || [ -n "${FZF_INNER:-}" ]; then
-        # Inside interactive terminal / fzf window
-        [ -f "$CONFIG_DIR/matugen/fzf-colors.sh" ] && source "$CONFIG_DIR/matugen/fzf-colors.sh"
-        local preview_script="$CONFIG_DIR/fzf/wallpaper-preview.sh"
-        [ ! -f "$preview_script" ] && preview_script="$(dirname "$0")/../fzf/scripts/wallpaper-preview.sh"
-        selected=$(
-            for f in "${images[@]}"; do
-                echo "$(basename "$f")	$f"
-            done | fzf \
-                --delimiter='	' \
-                --with-nth=1 \
-                --prompt=" Wallpaper > " \
-                --header="Select wallpaper to apply theme" \
-                --preview="\"$preview_script\" {2}" \
-                --preview-window="right:60%" \
-                | cut -f2
-        )
-    else
-        local win_launcher="$CONFIG_DIR/fzf/fzf-window.sh"
-        [ ! -f "$win_launcher" ] && win_launcher="$(dirname "$0")/fzf/fzf-window.sh"
-        local wp_script="$CONFIG_DIR/matugen/wallpaper-select.sh"
-        [ ! -f "$wp_script" ] && wp_script="$(realpath "$0")"
-
-        if [ -f "$win_launcher" ]; then
-            exec "$win_launcher" "Wallpaper Selector" 960 600 "FZF_INNER=1 \"$wp_script\" --static"
-            return 0
-        else
-            selected=$(
-                for f in "${images[@]}"; do
-                    local thumb="$THUMB_DIR/$(basename "$f" | sed 's/\.[^.]*$//').jpg"
-                    if [ -f "$thumb" ]; then
-                        echo -ne "$f\0icon\x1f$thumb\n"
-                    else
-                        echo -ne "$f\0icon\x1f$f\n"
-                    fi
-                done \
-                | rofi -dmenu -i -p "" -theme "$ROFI_THEME" -show-icons
-            )
-        fi
-    fi
+    selected=$(
+        for f in "${images[@]}"; do
+            local thumb="$THUMB_DIR/$(basename "$f" | sed 's/\.[^.]*$//').jpg"
+            if [ -f "$thumb" ]; then
+                echo -ne "$f\0icon\x1f$thumb\n"
+            else
+                echo -ne "$f\0icon\x1f$f\n"
+            fi
+        done \
+        | rofi -dmenu -i -p "" -theme "$ROFI_THEME" -show-icons
+    )
 
     if [ -z "$selected" ]; then
         return 1
@@ -345,41 +315,13 @@ pick_live() {
     fi
 
     local selected
-    if [ -t 0 ] || [ -n "${FZF_INNER:-}" ]; then
-        [ -f "$CONFIG_DIR/matugen/fzf-colors.sh" ] && source "$CONFIG_DIR/matugen/fzf-colors.sh"
-        local preview_script="$CONFIG_DIR/fzf/wallpaper-preview.sh"
-        [ ! -f "$preview_script" ] && preview_script="$(dirname "$0")/../fzf/scripts/wallpaper-preview.sh"
-        selected=$(
-            for f in "${videos[@]}"; do
-                echo "$(basename "$f")	$f"
-            done | fzf \
-                --delimiter='	' \
-                --with-nth=1 \
-                --prompt="󰕧 Live Wallpaper > " \
-                --header="Select animated/video wallpaper" \
-                --preview="\"$preview_script\" {2}" \
-                --preview-window="right:60%" \
-                | cut -f2
-        )
-    else
-        local win_launcher="$CONFIG_DIR/fzf/fzf-window.sh"
-        [ ! -f "$win_launcher" ] && win_launcher="$(dirname "$0")/fzf/fzf-window.sh"
-        local wp_script="$CONFIG_DIR/matugen/wallpaper-select.sh"
-        [ ! -f "$wp_script" ] && wp_script="$(realpath "$0")"
-
-        if [ -f "$win_launcher" ]; then
-            exec "$win_launcher" "Live Wallpaper Selector" 960 600 "FZF_INNER=1 \"$wp_script\" --live"
-            return 0
-        else
-            selected=$(
-                for f in "${videos[@]}"; do
-                    thumb=$(generate_thumb "$f")
-                    echo -ne "$f\0icon\x1f$thumb\n"
-                done \
-                | rofi -dmenu -i -p "" -theme "$ROFI_THEME" -show-icons
-            )
-        fi
-    fi
+    selected=$(
+        for f in "${videos[@]}"; do
+            thumb=$(generate_thumb "$f")
+            echo -ne "$f\0icon\x1f$thumb\n"
+        done \
+        | rofi -dmenu -i -p "" -theme "$ROFI_THEME" -show-icons
+    )
 
     if [ -z "$selected" ]; then
         return 1
@@ -402,32 +344,15 @@ main_menu() {
     local has_live=false
     [ -d "$LIVE_DIR" ] && [ "$(find "$LIVE_DIR" -maxdepth 1 -type f 2>/dev/null | wc -l)" -gt 0 ] && has_live=true
 
+    local icons_dir="$CONFIG_DIR/rofi/icons"
     local choice
-    if [ -t 0 ] || [ -n "${FZF_INNER:-}" ]; then
-        [ -f "$CONFIG_DIR/matugen/fzf-colors.sh" ] && source "$CONFIG_DIR/matugen/fzf-colors.sh"
-        local options=("Static wallpaper")
-        $has_live && options+=("Live wallpaper")
-        choice=$(printf "%s\n" "${options[@]}" | fzf --prompt=" Wallpaper Type > " --height=100% --layout=reverse --no-info)
-    else
-        local win_launcher="$CONFIG_DIR/fzf/fzf-window.sh"
-        [ ! -f "$win_launcher" ] && win_launcher="$(dirname "$0")/fzf/fzf-window.sh"
-        local wp_script="$CONFIG_DIR/matugen/wallpaper-select.sh"
-        [ ! -f "$wp_script" ] && wp_script="$(realpath "$0")"
-
-        if [ -f "$win_launcher" ]; then
-            exec "$win_launcher" "Wallpaper Menu" 420 230 "FZF_INNER=1 \"$wp_script\""
-            return 0
-        else
-            local icons_dir="$CONFIG_DIR/rofi/icons"
-            choice=$(
-                {
-                    printf "Static wallpaper\0icon\x1f${icons_dir}/static.svg\n"
-                    $has_live && printf "Live wallpaper\0icon\x1f${icons_dir}/live.svg\n"
-                } | rofi -dmenu -i -p "Wallpaper" -theme "$ROFI_POWER" -show-icons \
-                    -theme-str 'listview { lines: 2; }'
-            )
-        fi
-    fi
+    choice=$(
+        {
+            printf "Static wallpaper\0icon\x1f${icons_dir}/static.svg\n"
+            $has_live && printf "Live wallpaper\0icon\x1f${icons_dir}/live.svg\n"
+        } | rofi -dmenu -i -p "Wallpaper" -theme "$ROFI_POWER" -show-icons \
+            -theme-str 'listview { lines: 2; }'
+    )
 
     case "$choice" in
         "Static wallpaper") pick_static ;;
@@ -441,8 +366,6 @@ if [ $# -eq 1 ] && [ -f "$1" ]; then
     set_static "$1"
 elif [ $# -eq 1 ] && [ "$1" = "--live" ]; then
     pick_live
-elif [ $# -eq 1 ] && [ "$1" = "--static" ]; then
-    pick_static
 else
     main_menu
 fi

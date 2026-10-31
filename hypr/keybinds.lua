@@ -75,18 +75,18 @@ hl.bind(SS .. " + C", hl.dsp.exec_cmd("hyprpicker -a && notify-send \"Color pick
 -- Notifications
 hl.bind(S .. " + N", hl.dsp.exec_cmd("swaync-client -t"))
 
--- Application launcher (fzf floating launcher)
-hl.bind(S .. " + space", hl.dsp.exec_cmd("~/.config/fzf/launcher.sh"))
+-- Rofi launcher
+hl.bind(S .. " + space", hl.dsp.exec_cmd("rofi -show drun -theme ~/.config/rofi/themes/launcher.rasi"))
 
--- Spotlight search (apps, commands, files, web) via fzf
-hl.bind(AL .. " + space", hl.dsp.exec_cmd("~/.config/fzf/spotlight.sh"))
+-- Spotlight search (apps, commands, files, windows) — on-demand, no daemon
+hl.bind(AL .. " + space", hl.dsp.exec_cmd("~/.config/rofi/scripts/spotlight.sh"))
 
--- Power menu via fzf
-hl.bind(S .. " + P", hl.dsp.exec_cmd("~/.config/fzf/system-power.sh"))
+-- Power menu
+hl.bind(S .. " + P", hl.dsp.exec_cmd("~/.config/rofi/scripts/system-power.sh"))
 
--- Clipboard history via fzf
-hl.bind(S  .. " + V", hl.dsp.exec_cmd("~/.config/fzf/clipboard.sh"))
-hl.bind(SS .. " + V", hl.dsp.exec_cmd("~/.config/fzf/clipboard.sh --delete"))
+-- Clipboard history
+hl.bind(S  .. " + V", hl.dsp.exec_cmd("~/.config/rofi/scripts/clipboard.sh"))
+hl.bind(SS .. " + V", hl.dsp.exec_cmd("~/.config/rofi/scripts/clipboard.sh --delete"))
 hl.bind(SA .. " + V", hl.dsp.exec_cmd("cliphist wipe"))
 
 -- Additional useful binds
