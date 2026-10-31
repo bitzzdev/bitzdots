@@ -41,6 +41,12 @@ if test -f /etc/arch-release
             echo "  services         Active systemd services"
             echo "  reboot           Reboot system"
             echo "  poweroff         Power off system"
+            echo ""
+            echo "Theme & Matugen Cache:"
+            echo "  cache clear      Clear all matugen/theme caches & thumbs"
+            echo "  theme regen      Regenerate theme from current wallpaper"
+            echo "  theme reload     Reload UI components (waybar, hypr, etc.)"
+            echo "  theme precache   Pre-generate color schemes for all wallpapers"
             return 0
         end
 
@@ -48,6 +54,43 @@ if test -f /etc/arch-release
         set -l args $argv[2..-1]
 
         switch $cmd
+            case cache
+                set -l subcmd $argv[2]
+                switch "$subcmd"
+                    case clear clean
+                        rm -rf ~/.cache/matugen ~/.cache/matugen-thumbs ~/.cache/matugen-backup ~/.cache/wallust ~/.cache/wallust-thumbs ~/.cache/wallust-backup
+                        echo "Cleared all matugen and theme caches."
+                    case '*'
+                        echo "Usage: dev cache clear"
+                end
+            case theme
+                set -l subcmd $argv[2]
+                switch "$subcmd"
+                    case regen
+                        if test -f "$HOME/.cache/current_wallpaper.png"
+                            matugen image "$HOME/.cache/current_wallpaper.png" --config "$HOME/.config/matugen/config.toml"
+                            if test -f "$HOME/.config/matugen/reload-theme.sh"
+                                "$HOME/.config/matugen/reload-theme.sh"
+                            end
+                            echo "Regenerated theme from current wallpaper."
+                        else
+                            echo "No current wallpaper found at ~/.cache/current_wallpaper.png"
+                        end
+                    case reload
+                        if test -f "$HOME/.config/matugen/reload-theme.sh"
+                            "$HOME/.config/matugen/reload-theme.sh"
+                        else
+                            echo "Reload script not found at ~/.config/matugen/reload-theme.sh"
+                        end
+                    case precache
+                        if test -f "$HOME/.config/matugen/cache-wallpapers.sh"
+                            "$HOME/.config/matugen/cache-wallpapers.sh"
+                        else
+                            echo "Cache script not found at ~/.config/matugen/cache-wallpapers.sh"
+                        end
+                    case '*'
+                        echo "Usage: dev theme [regen | reload | precache]"
+                end
             case u update
                 sudo pacman -Syu $args
             case s search
