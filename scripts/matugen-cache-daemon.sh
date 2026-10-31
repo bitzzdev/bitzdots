@@ -26,6 +26,8 @@ MATUGEN_OUTPUTS=(
     "matugen/chromium-theme.json"
     "rofi/themes/wallpaper-grid.rasi"
     "rofi/themes/power.rasi"
+    "rofi/themes/launcher.rasi"
+    "rofi/themes/clipboard.rasi"
     "rofi/icons/lock.svg"
     "rofi/icons/logout.svg"
     "rofi/icons/sleep.svg"

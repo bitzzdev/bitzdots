@@ -58,6 +58,10 @@ output_path = "~/.config/rofi/themes/power.rasi"
 input_path = "~/.config/matugen/templates/launcher.rasi"
 output_path = "~/.config/rofi/themes/launcher.rasi"
 
+[templates.clipboard]
+input_path = "~/.config/matugen/templates/clipboard.rasi"
+output_path = "~/.config/rofi/themes/clipboard.rasi"
+
 [templates.hyprlock]
 input_path = "~/.config/matugen/templates/hyprlock.conf"
 output_path = "~/.config/hypr/hyprlock.conf"

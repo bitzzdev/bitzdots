@@ -107,6 +107,7 @@ All 25 templates in `matugen/templates/`:
 | `qt6ct.conf.j2` | `qt6ct/qt6ct.conf` | Qt6 theme |
 | `bitzdots.colors.j2` | `color-schemes/bitzdots.colors` | KDE scheme |
 | `launcher.rasi.j2` | `rofi/themes/launcher.rasi` | Launcher theme |
+| `clipboard.rasi.j2` | `rofi/themes/clipboard.rasi` | Clipboard theme |
 | `power.rasi.j2` | `rofi/themes/power.rasi` | Power menu theme |
 | `wallpaper-grid.rasi.j2` | `rofi/themes/wallpaper-grid.rasi` | Wallpaper picker |
 | `lock.svg.j2` | `rofi/icons/lock.svg` | Lock icon |

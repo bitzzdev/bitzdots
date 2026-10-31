@@ -48,6 +48,7 @@ The `matugen/templates/` directory contains a Jinja2 template for every themed c
 | `cava-colors.j2` | `cava/themes/generated` | Audio visualizer |
 | `rofi-colors.rasi.j2` | `rofi/theme-generated.rasi` | Rofi base theme |
 | `launcher.rasi.j2` | `rofi/themes/launcher.rasi` | App launcher theme |
+| `clipboard.rasi.j2` | `rofi/themes/clipboard.rasi` | Clipboard theme |
 | `power.rasi.j2` | `rofi/themes/power.rasi` | Power menu theme |
 | `wallpaper-grid.rasi.j2` | `rofi/themes/wallpaper-grid.rasi` | Wallpaper picker theme |
 | `lock.svg.j2` | `rofi/icons/lock.svg` | Lock icon |
