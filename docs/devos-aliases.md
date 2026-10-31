@@ -52,6 +52,27 @@ Auto-detects whether `paru` or `yay` is installed on your system.
 
 ---
 
+## Theme & Cache Management
+
+| Command | Description |
+| :--- | :--- |
+| `dev theme regen` | Regenerate Material You (M3) color scheme from the active wallpaper |
+| `dev theme reload` | Reload UI components (Waybar, Hyprland borders, SwayNC, Kitty) |
+| `dev theme precache` | Pre-generate and cache color schemes for all wallpapers in background |
+| `dev cache clear` | Clear matugen generated color palettes, wallpaper thumbnails, and cache |
+| `dev cache status` | View disk usage and entry count of theme caches and thumbnails |
+
+---
+
+## Font Management
+
+| Command | Description |
+| :--- | :--- |
+| `dev font switch [paper\|jetbrains]` | Switch system font to Paper Mono or JetBrainsMono Nerd Font |
+| `dev font toggle` | Toggle between Paper Mono and JetBrainsMono Nerd Font |
+
+---
+
 ## Usage Examples
 
 ```fish

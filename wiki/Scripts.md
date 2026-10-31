@@ -145,6 +145,21 @@ Boot-time WiFi stabilizer. Called from `hypr/autostart.lua` a few seconds after 
 
 Fixes the boot-time "strikethrough WiFi" waybar icon and impala crashes caused by NetworkManager not being ready.
 
+### `font-switch.sh`
+
+System font switcher between **Paper Mono** and **JetBrainsMono Nerd Font**.
+
+```bash
+font-switch.sh [paper | jetbrains]
+font-switch.sh toggle               # or dev font toggle
+```
+
+**What it does:**
+1. Checks if Paper Mono is installed; if not, downloads and installs it globally (`/usr/local/share/fonts/paper-mono/`).
+2. Updates `kitty.conf` font family and signals running Kitty instances (`SIGUSR1`) to reload live.
+3. Updates Waybar text font dynamically while preserving Nerd Font icons across the bar via Pango markup.
+4. Restarts Waybar smoothly to apply styling changes.
+
 ## Rofi Scripts (`rofi/scripts/`)
 
 ### `clipboard.sh`
