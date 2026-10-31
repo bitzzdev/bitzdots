@@ -34,6 +34,10 @@ output_path = "~/.config/cava/themes/generated"
 input_path = "~/.config/matugen/templates/rofi-colors.rasi"
 output_path = "~/.config/rofi/theme-generated.rasi"
 
+[templates.fzf]
+input_path = "~/.config/matugen/templates/fzf-colors.sh"
+output_path = "~/.config/matugen/fzf-colors.sh"
+
 [templates.env]
 input_path = "~/.config/matugen/templates/matugen-env"
 output_path = "~/.config/matugen/env"

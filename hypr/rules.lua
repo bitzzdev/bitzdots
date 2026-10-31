@@ -100,6 +100,13 @@ hl.window_rule({
 })
 
 hl.window_rule({
+    name    = "float-system-fzf",
+    match   = { class = "^system-fzf$" },
+    float   = true,
+    center  = true,
+})
+
+hl.window_rule({
     name           = "suppress-maximize",
     match          = { class = ".*" },
     suppress_event = "maximize",

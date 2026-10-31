@@ -47,6 +47,10 @@ if test -f /etc/arch-release
             echo "  theme regen      Regenerate theme from current wallpaper"
             echo "  theme reload     Reload UI components (waybar, hypr, etc.)"
             echo "  theme precache   Pre-generate color schemes for all wallpapers"
+            echo ""
+            echo "Font & UI Management:"
+            echo "  font switch      Switch font (dev font switch [paper|jetbrains])"
+            echo "  font toggle      Toggle between Paper Mono and JetBrainsMono"
             return 0
         end
 
@@ -54,6 +58,39 @@ if test -f /etc/arch-release
         set -l args $argv[2..-1]
 
         switch $cmd
+            case font
+                set -l subcmd $argv[2]
+                switch "$subcmd"
+                    case switch
+                        set -l fontname $argv[3]
+                        if test -f "$HOME/.config/matugen/font-switch.sh"
+                            "$HOME/.config/matugen/font-switch.sh" "$fontname"
+                        else if test -f "$HOME/.local/bin/font-switch.sh"
+                            "$HOME/.local/bin/font-switch.sh" "$fontname"
+                        else
+                            set -l git_script (git rev-parse --show-toplevel 2>/dev/null)/scripts/font-switch.sh
+                            if test -f "$git_script"
+                                "$git_script" "$fontname"
+                            else
+                                echo "font-switch.sh not found."
+                            end
+                        end
+                    case toggle ''
+                        if test -f "$HOME/.config/matugen/font-switch.sh"
+                            "$HOME/.config/matugen/font-switch.sh" toggle
+                        else if test -f "$HOME/.local/bin/font-switch.sh"
+                            "$HOME/.local/bin/font-switch.sh" toggle
+                        else
+                            set -l git_script (git rev-parse --show-toplevel 2>/dev/null)/scripts/font-switch.sh
+                            if test -f "$git_script"
+                                "$git_script" toggle
+                            else
+                                echo "font-switch.sh not found."
+                            end
+                        end
+                    case '*'
+                        echo "Usage: dev font switch [paper|jetbrains] OR dev font toggle"
+                end
             case cache
                 set -l subcmd $argv[2]
                 switch "$subcmd"
@@ -180,5 +217,7 @@ if test -f /etc/arch-release
     alias dev-top='dev top'
     alias dev-log='dev log'
     alias dev-services='dev services'
+    alias dev-font='dev font'
+    alias dev-font-toggle='dev font toggle'
 end
 

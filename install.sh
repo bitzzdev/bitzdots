@@ -48,7 +48,7 @@ install_deps() {
                 hyprland waybar swaync rofi kitty cava
                 hyprpicker wl-clipboard playerctl pavucontrol
                 polkit-kde-agent grim slurp cliphist hyprlock ffmpeg
-                btop pulsemixer wf-recorder python
+                btop pulsemixer wf-recorder python fzf chafa
                 power-profiles-daemon breeze inotify-tools fish fastfetch
                 brightnessctl bluez bluez-utils libnotify networkmanager
                 wireplumber pipewire-pulse curl jq imagemagick
@@ -104,7 +104,7 @@ install_deps() {
         fedora)
             log "Installing packages (Fedora)..."
             sudo dnf install -y \
-                hyprland waybar swaync wlogout rofi kitty cava \
+                hyprland waybar swaync wlogout rofi kitty cava fzf \
                 awww hyprpicker wl-clipboard playerctl pavucontrol \
                 polkit-kde-agent grim slurp cliphist hyprlock ffmpeg \
                 inotify-tools fish fastfetch btop pulsemixer \
@@ -121,7 +121,7 @@ install_deps() {
         debian)
             log "Installing packages (Debian/Ubuntu)..."
             sudo apt install -y \
-                hyprland waybar swaync wlogout rofi kitty cava \
+                hyprland waybar swaync wlogout rofi kitty cava fzf \
                 awww hyprpicker wl-clipboard playerctl pavucontrol \
                 polkit-kde-agent grim slurp cliphist hyprlock ffmpeg \
                 inotify-tools fish fastfetch btop pulsemixer \
@@ -260,7 +260,7 @@ install_scripts() {
     local scripts_dir="$CONFIG_DIR/matugen"
     mkdir -p "$scripts_dir/templates"
 
-    for s in reload-theme.sh wallpaper-select.sh cache-wallpapers.sh matugen-cache-daemon.sh record-fullscreen.sh record-region.sh recording-indicator.sh wifi-fix.sh; do
+    for s in reload-theme.sh wallpaper-select.sh cache-wallpapers.sh matugen-cache-daemon.sh record-fullscreen.sh record-region.sh recording-indicator.sh wifi-fix.sh font-switch.sh; do
         ln -sf "$DOTFILES_DIR/scripts/$s" "$scripts_dir/$s"
     done
 
@@ -270,19 +270,27 @@ install_scripts() {
         [ -e "$t" ] && ln -sf "$t" "$scripts_dir/templates/"
     done
 
+    # fzf launchers and dialogs
+    mkdir -p "$CONFIG_DIR/fzf"
+    ln -sf "$DOTFILES_DIR/scripts/fzf/fzf-window.sh" "$CONFIG_DIR/fzf/fzf-window.sh"
+    for f in "$DOTFILES_DIR/fzf/scripts"/*; do
+        [ -e "$f" ] && ln -sf "$f" "$CONFIG_DIR/fzf/$(basename "$f")"
+    done
+
     mkdir -p "$HOME/.local/bin"
     ln -sf "$DOTFILES_DIR/scripts/hyprlogout" "$HOME/.local/bin/hyprlogout"
+    ln -sf "$DOTFILES_DIR/scripts/font-switch.sh" "$HOME/.local/bin/font-switch.sh"
 
-    ok "Matugen scripts and templates linked"
+    ok "Matugen and fzf scripts and templates linked"
 }
 
 make_executable() {
-    for d in "$CONFIG_DIR/waybar/scripts" "$CONFIG_DIR/rofi/scripts" "$CONFIG_DIR/matugen"; do
+    for d in "$CONFIG_DIR/waybar/scripts" "$CONFIG_DIR/rofi/scripts" "$CONFIG_DIR/matugen" "$CONFIG_DIR/fzf"; do
         for s in "$d"/*.sh; do
             chmod +x "$s" 2>/dev/null || true
         done
     done
-    chmod +x "$HOME/.local/bin/hyprlogout" 2>/dev/null || true
+    chmod +x "$HOME/.local/bin/hyprlogout" "$HOME/.local/bin/font-switch.sh" 2>/dev/null || true
     ok "Scripts made executable"
 }
 

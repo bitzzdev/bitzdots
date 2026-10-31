@@ -1,4 +1,10 @@
 #!/bin/bash
+# Clipboard manager delegating to fzf (or fallback to rofi if fzf script missing)
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
+if [ -f "$CONFIG_DIR/fzf/clipboard.sh" ]; then
+    exec "$CONFIG_DIR/fzf/clipboard.sh" "$@"
+fi
+
 # Rofi clipboard manager using cliphist
 # Usage: clipboard.sh           — copy mode
 #        clipboard.sh --delete  — delete mode (SUPER+SHIFT+V)

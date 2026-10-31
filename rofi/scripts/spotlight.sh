@@ -1,4 +1,10 @@
 #!/bin/bash
+# Spotlight search delegating to fzf (or fallback to rofi if fzf script missing)
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
+if [ -f "$CONFIG_DIR/fzf/spotlight.sh" ]; then
+    exec "$CONFIG_DIR/fzf/spotlight.sh" "$@"
+fi
+
 # Spotlight search (Spotlight-style launcher)
 # ALT+SPACE -> search across:
 #   - installed applications   (from .desktop entries, with their icons)
