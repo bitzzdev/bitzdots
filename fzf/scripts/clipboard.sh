@@ -58,10 +58,14 @@ run_inside() {
     fi
 }
 
-if [ "${1:-}" = "--inner" ] || [ "${2:-}" = "--inner" ]; then
+if [ "${1:-}" = "--inner" ] || [ "${2:-}" = "--inner" ] || [ -n "${FZF_INNER:-}" ]; then
     run_inside
 else
     mode_arg=""
     $DELETE_MODE && mode_arg="--delete"
-    "$CONFIG_DIR/fzf/fzf-window.sh" "Clipboard Manager" 880 500 "$CONFIG_DIR/fzf/clipboard.sh --inner $mode_arg"
+    win_launcher="$CONFIG_DIR/fzf/fzf-window.sh"
+    [ ! -f "$win_launcher" ] && win_launcher="$(dirname "$0")/../../scripts/fzf/fzf-window.sh"
+    self_script="$CONFIG_DIR/fzf/clipboard.sh"
+    [ ! -f "$self_script" ] && self_script="$(realpath "$0")"
+    exec "$win_launcher" "Clipboard Manager" 880 500 "$self_script --inner $mode_arg"
 fi

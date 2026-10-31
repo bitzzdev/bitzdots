@@ -56,9 +56,9 @@ switch_to() {
             [ -f "$kitty_conf" ] && sed -i 's/^font_family .*/font_family                 Paper Mono/' "$kitty_conf"
             [ -f "$kitty_target" ] && sed -i 's/^font_family .*/font_family                 Paper Mono/' "$kitty_target"
 
-            # 2. Update waybar template
-            [ -f "$waybar_css" ] && sed -i 's/font-family: "[^"]*", "JetBrains Mono"/font-family: "Paper Mono", "JetBrains Mono"/' "$waybar_css"
-            [ -f "$waybar_active" ] && sed -i 's/font-family: "[^"]*", "JetBrains Mono"/font-family: "Paper Mono", "JetBrains Mono"/' "$waybar_active"
+            # 2. Update waybar template (keep JetBrainsMono Nerd Font fallback for icons)
+            [ -f "$waybar_css" ] && sed -i 's/font-family: "[^"]*", "JetBrains Mono"/font-family: "Paper Mono", "JetBrainsMono Nerd Font", "JetBrains Mono"/' "$waybar_css"
+            [ -f "$waybar_active" ] && sed -i 's/font-family: "[^"]*", "JetBrains Mono"/font-family: "Paper Mono", "JetBrainsMono Nerd Font", "JetBrains Mono"/' "$waybar_active"
 
             echo "Font switched to Paper Mono."
             ;;

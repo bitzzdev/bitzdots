@@ -32,8 +32,12 @@ run_inside() {
     esac
 }
 
-if [ "${1:-}" = "--inner" ]; then
+if [ "${1:-}" = "--inner" ] || [ -n "${FZF_INNER:-}" ]; then
     run_inside
 else
-    "$CONFIG_DIR/fzf/fzf-window.sh" "Power Menu" 380 260 "$CONFIG_DIR/fzf/system-power.sh --inner"
+    win_launcher="$CONFIG_DIR/fzf/fzf-window.sh"
+    [ ! -f "$win_launcher" ] && win_launcher="$(dirname "$0")/../../scripts/fzf/fzf-window.sh"
+    self_script="$CONFIG_DIR/fzf/system-power.sh"
+    [ ! -f "$self_script" ] && self_script="$(realpath "$0")"
+    exec "$win_launcher" "Power Menu" 380 260 "$self_script --inner"
 fi

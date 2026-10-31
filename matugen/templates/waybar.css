@@ -71,6 +71,20 @@
     margin: 0;
 }
 
+/* Ensure Nerd Font icons always use JetBrainsMono Nerd Font */
+#network,
+#bluetooth,
+#pulseaudio,
+#cpu,
+#memory,
+#custom-power,
+#custom-power-profiles,
+#custom-recording,
+#custom-brightness,
+#custom-notification {
+    font-family: "JetBrainsMono Nerd Font", "JetBrains Mono", monospace;
+}
+
 window#waybar {
     background: alpha(@surface_container_lowest, 0.88);
     color: @on_surface;
