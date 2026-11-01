@@ -276,29 +276,39 @@ pick_static() {
     selected=$(
         for f in "${images[@]}"; do
             local thumb="$THUMB_DIR/$(basename "$f" | sed 's/\.[^.]*$//').jpg"
+            local display_name
+            display_name="$(basename "$f")"
             if [ -f "$thumb" ]; then
-                echo -ne "$f\0icon\x1f$thumb\n"
+                echo -ne "$display_name\0icon\x1f$thumb\n"
             else
-                echo -ne "$f\0icon\x1f$f\n"
+                echo -ne "$display_name\0icon\x1f$f\n"
             fi
         done \
-        | rofi -dmenu -i -p "" -theme "$ROFI_THEME" -show-icons
+        | rofi -dmenu -i -p "Wallpapers" -theme "$ROFI_THEME" -show-icons
     )
 
     if [ -z "$selected" ]; then
         return 1
     fi
 
-    if [ ! -f "$selected" ]; then
-        selected="$WALL_DIR/$selected"
+    local target_file=""
+    for f in "${images[@]}"; do
+        if [ "$(basename "$f")" = "$selected" ] || [ "$f" = "$selected" ]; then
+            target_file="$f"
+            break
+        fi
+    done
+
+    if [ -z "$target_file" ] && [ -f "$WALL_DIR/$selected" ]; then
+        target_file="$WALL_DIR/$selected"
     fi
 
-    if [ ! -f "$selected" ]; then
+    if [ -z "$target_file" ] || [ ! -f "$target_file" ]; then
         alert "Wallpaper not found" critical "$selected"
         return 1
     fi
 
-    set_static "$selected"
+    set_static "$target_file"
 }
 
 # ── Pick live wallpaper ──────────────────────────────────────────
@@ -320,25 +330,35 @@ pick_live() {
     selected=$(
         for f in "${videos[@]}"; do
             thumb=$(generate_thumb "$f")
-            echo -ne "$f\0icon\x1f$thumb\n"
+            local display_name
+            display_name="$(basename "$f")"
+            echo -ne "$display_name\0icon\x1f$thumb\n"
         done \
-        | rofi -dmenu -i -p "" -theme "$ROFI_THEME" -show-icons
+        | rofi -dmenu -i -p "Live Wallpapers" -theme "$ROFI_THEME" -show-icons
     )
 
     if [ -z "$selected" ]; then
         return 1
     fi
 
-    if [ ! -f "$selected" ]; then
-        selected="$LIVE_DIR/$selected"
+    local target_file=""
+    for f in "${videos[@]}"; do
+        if [ "$(basename "$f")" = "$selected" ] || [ "$f" = "$selected" ]; then
+            target_file="$f"
+            break
+        fi
+    done
+
+    if [ -z "$target_file" ] && [ -f "$LIVE_DIR/$selected" ]; then
+        target_file="$LIVE_DIR/$selected"
     fi
 
-    if [ ! -f "$selected" ]; then
+    if [ -z "$target_file" ] || [ ! -f "$target_file" ]; then
         alert "Video not found" critical "$selected"
         return 1
     fi
 
-    set_live "$selected"
+    set_live "$target_file"
 }
 
 # ── Main menu ────────────────────────────────────────────────────
